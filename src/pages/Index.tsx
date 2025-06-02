@@ -102,7 +102,7 @@ const Index = () => {
             </div>
             <Button 
               onClick={handleEmergencyCall}
-              className="bg-liberia-red hover:bg-liberia-red/90 text-white font-bold px-6 py-2 rounded-full animate-pulse"
+              className="bg-white text-black hover:bg-gray-100 font-bold px-6 py-2 rounded-full animate-pulse"
             >
               Emergency Call
             </Button>

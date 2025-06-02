@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Phone, MapPin, Clock, Users } from 'lucide-react';
+import { ArrowLeft, Phone, MapPin, Clock, Users, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmergencyType, Location, EmergencyTeam } from '@/pages/Index';
+import { VideoCall } from '@/components/VideoCall';
 import { useToast } from '@/hooks/use-toast';
 
 interface NearestTeamsProps {
@@ -22,6 +22,7 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
 }) => {
   const [teams, setTeams] = useState<EmergencyTeam[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeCall, setActiveCall] = useState<{ team: EmergencyTeam; isVideo: boolean } | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -85,12 +86,21 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
     }
   }, [emergencyType, userLocation]);
 
-  const handleCallTeam = (team: EmergencyTeam) => {
+  const handleCallTeam = (team: EmergencyTeam, isVideo: boolean = false) => {
     toast({
-      title: "Calling emergency team",
+      title: `Starting ${isVideo ? 'video' : 'audio'} call`,
       description: `Connecting you to ${team.name}...`,
     });
-    // In real app: window.location.href = `tel:${team.contact}`;
+    
+    setActiveCall({ team, isVideo });
+  };
+
+  const handleEndCall = () => {
+    setActiveCall(null);
+    toast({
+      title: "Call ended",
+      description: "Call has been disconnected.",
+    });
   };
 
   const getEmergencyTypeColor = (type: EmergencyType) => {
@@ -102,6 +112,16 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
       default: return 'text-gray-600';
     }
   };
+
+  if (activeCall) {
+    return (
+      <VideoCall
+        teamName={activeCall.team.name}
+        isVideoCall={activeCall.isVideo}
+        onEndCall={handleEndCall}
+      />
+    );
+  }
 
   return (
     <div className="py-6">
@@ -169,14 +189,22 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
                 </div>
               </div>
 
-              <div className="flex space-x-3">
+              <div className="flex space-x-2">
                 <Button 
-                  onClick={() => handleCallTeam(team)}
+                  onClick={() => handleCallTeam(team, false)}
                   disabled={team.status === 'busy'}
-                  className="flex-1 bg-liberia-red hover:bg-liberia-red/90 text-white"
+                  className="flex-1 bg-white text-black hover:bg-gray-100"
                 >
                   <Phone className="h-4 w-4 mr-2" />
-                  Call Team
+                  Audio Call
+                </Button>
+                <Button 
+                  onClick={() => handleCallTeam(team, true)}
+                  disabled={team.status === 'busy'}
+                  className="flex-1 bg-white text-black hover:bg-gray-100"
+                >
+                  <Video className="h-4 w-4 mr-2" />
+                  Video Call
                 </Button>
                 <Button 
                   onClick={onReportEmergency}
@@ -192,7 +220,7 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
           <div className="pt-4">
             <Button 
               onClick={onReportEmergency}
-              className="w-full bg-liberia-blue hover:bg-liberia-blue/90 text-white py-3"
+              className="w-full bg-white text-black hover:bg-gray-100 py-3"
             >
               Submit Detailed Emergency Report
             </Button>

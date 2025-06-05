@@ -4,8 +4,8 @@ import { Home, FileText, Newspaper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface NavigationProps {
-  currentView: 'home' | 'teams' | 'report' | 'news';
-  onViewChange: (view: 'home' | 'teams' | 'report' | 'news') => void;
+  currentView: 'home' | 'news' | 'my-reports';
+  onViewChange: (view: 'home' | 'news' | 'my-reports') => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ currentView, onViewChange }) => {
@@ -17,9 +17,9 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onViewChang
       color: 'text-liberia-red'
     },
     {
-      id: 'report' as const,
+      id: 'my-reports' as const,
       icon: FileText,
-      label: 'Report',
+      label: 'My Reports',
       color: 'text-green-500'
     },
     {

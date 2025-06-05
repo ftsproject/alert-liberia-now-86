@@ -4,6 +4,7 @@ import { EmergencyTypeSelector } from '@/components/EmergencyTypeSelector';
 import { NearestTeams } from '@/components/NearestTeams';
 import { ReportForm } from '@/components/ReportForm';
 import { NewsFeed } from '@/components/NewsFeed';
+import { MyReports } from '@/components/MyReports';
 import { Navigation } from '@/components/Navigation';
 import { Shield, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,8 +29,10 @@ export interface EmergencyTeam {
 }
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<'home' | 'teams' | 'report' | 'news'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'news' | 'my-reports'>('home');
   const [selectedEmergencyType, setSelectedEmergencyType] = useState<EmergencyType | null>(null);
+  const [showTeams, setShowTeams] = useState(false);
+  const [showReportForm, setShowReportForm] = useState(false);
   const [userLocation, setUserLocation] = useState<Location | null>(null);
   const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'pending'>('pending');
   const { toast } = useToast();
@@ -68,7 +71,7 @@ const Index = () => {
   const handleEmergencyTypeSelect = (type: EmergencyType) => {
     setSelectedEmergencyType(type);
     if (userLocation) {
-      setCurrentView('teams');
+      setShowTeams(true);
     } else {
       toast({
         title: "Location required",
@@ -85,6 +88,26 @@ const Index = () => {
       title: "Emergency call initiated",
       description: "Calling emergency services...",
     });
+  };
+
+  const handleBackToHome = () => {
+    setShowTeams(false);
+    setShowReportForm(false);
+    setSelectedEmergencyType(null);
+    setCurrentView('home');
+  };
+
+  const handleReportEmergency = () => {
+    setShowTeams(false);
+    setShowReportForm(true);
+  };
+
+  const handleReportSubmit = () => {
+    toast({
+      title: "Report submitted",
+      description: "Your emergency report has been sent to the response team.",
+    });
+    handleBackToHome();
   };
 
   return (
@@ -127,36 +150,30 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 pb-20 md:pb-24">
-        {currentView === 'home' && (
+        {currentView === 'home' && !showTeams && !showReportForm && (
           <div className="animate-fade-in">
             <EmergencyTypeSelector onSelect={handleEmergencyTypeSelect} />
           </div>
         )}
 
-        {currentView === 'teams' && selectedEmergencyType && (
+        {showTeams && selectedEmergencyType && (
           <div className="animate-slide-up">
             <NearestTeams 
               emergencyType={selectedEmergencyType}
               userLocation={userLocation}
-              onBack={() => setCurrentView('home')}
-              onReportEmergency={() => setCurrentView('report')}
+              onBack={handleBackToHome}
+              onReportEmergency={handleReportEmergency}
             />
           </div>
         )}
 
-        {currentView === 'report' && selectedEmergencyType && (
+        {showReportForm && selectedEmergencyType && (
           <div className="animate-slide-up">
             <ReportForm 
               emergencyType={selectedEmergencyType}
               userLocation={userLocation}
-              onBack={() => setCurrentView('teams')}
-              onSubmit={() => {
-                toast({
-                  title: "Report submitted",
-                  description: "Your emergency report has been sent to the response team.",
-                });
-                setCurrentView('home');
-              }}
+              onBack={() => setShowReportForm(false)}
+              onSubmit={handleReportSubmit}
             />
           </div>
         )}
@@ -164,6 +181,12 @@ const Index = () => {
         {currentView === 'news' && (
           <div className="animate-fade-in">
             <NewsFeed onBack={() => setCurrentView('home')} />
+          </div>
+        )}
+
+        {currentView === 'my-reports' && (
+          <div className="animate-fade-in">
+            <MyReports onBack={() => setCurrentView('home')} />
           </div>
         )}
       </main>

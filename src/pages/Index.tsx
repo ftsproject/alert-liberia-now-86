@@ -8,7 +8,6 @@ import { MyReports } from '@/components/MyReports';
 import { Navigation } from '@/components/Navigation';
 import { Shield, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 
 export type EmergencyType = 'police' | 'fire' | 'medical' | 'disaster';
@@ -136,19 +135,17 @@ const Index = () => {
 
       {/* Location Status */}
       <div className="container mx-auto px-4 py-2">
-        <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex items-center justify-center space-x-2 text-white/80 text-xs md:text-sm">
-            <MapPin className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
-            <span className="truncate">
-              {locationPermission === 'granted' && userLocation 
-                ? `Location detected - Emergency services available`
-                : locationPermission === 'denied'
-                ? 'Location access denied - Enable for better service'
-                : 'Detecting location...'
-              }
-            </span>
-          </div>
-        </ScrollArea>
+        <div className="flex items-center justify-center space-x-2 text-white/80 text-xs md:text-sm">
+          <MapPin className="h-3 w-3 md:h-4 md:w-4" />
+          <span>
+            {locationPermission === 'granted' && userLocation 
+              ? `Location: ${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`
+              : locationPermission === 'denied'
+              ? 'Location access denied'
+              : 'Detecting location...'
+            }
+          </span>
+        </div>
       </div>
 
       {/* Main Content */}

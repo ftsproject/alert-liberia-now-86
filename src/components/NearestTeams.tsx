@@ -124,33 +124,33 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
   }
 
   return (
-    <div className="py-6">
-      <div className="flex items-center mb-6">
+    <div className="py-4 md:py-6">
+      <div className="flex items-center mb-4 md:mb-6">
         <Button 
           variant="ghost" 
           onClick={onBack}
-          className="text-white hover:bg-white/10 mr-4"
+          className="text-white hover:bg-white/10 mr-3 md:mr-4 p-2"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
         </Button>
         <div>
-          <h2 className="text-2xl font-bold text-white capitalize">
+          <h2 className="text-xl md:text-2xl font-bold text-white capitalize">
             Nearest {emergencyType} Teams
           </h2>
-          <p className="text-white/70">Teams available in your area</p>
+          <p className="text-white/70 text-sm md:text-base">Teams available in your area</p>
         </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white">Finding nearest teams...</p>
+        <div className="text-center py-8 md:py-12">
+          <div className="animate-spin rounded-full h-8 w-8 md:h-12 md:w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-white text-sm md:text-base">Finding nearest teams...</p>
         </div>
       ) : teams.length === 0 ? (
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8 text-center">
-          <Users className="h-16 w-16 text-white/50 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">No teams available</h3>
-          <p className="text-white/70 mb-6">
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 md:p-8 text-center">
+          <Users className="h-12 w-12 md:h-16 md:w-16 text-white/50 mx-auto mb-4" />
+          <h3 className="text-lg md:text-xl font-semibold text-white mb-2">No teams available</h3>
+          <p className="text-white/70 mb-4 md:mb-6 text-sm md:text-base">
             No {emergencyType} teams are currently available in your area. 
             You can still submit a report for assistance.
           </p>
@@ -162,54 +162,54 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
           </Button>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           {teams.map((team) => (
-            <Card key={team.id} className="bg-white/10 backdrop-blur-md border-white/20 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className={`w-3 h-3 rounded-full ${team.status === 'available' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  <h3 className="text-lg font-semibold text-white">{team.name}</h3>
+            <Card key={team.id} className="bg-white/10 backdrop-blur-md border-white/20 p-4 md:p-6">
+              <div className="flex items-center justify-between mb-3 md:mb-4">
+                <div className="flex items-center space-x-2 md:space-x-3">
+                  <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full ${team.status === 'available' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  <h3 className="text-base md:text-lg font-semibold text-white">{team.name}</h3>
                 </div>
                 <Badge 
                   variant={team.status === 'available' ? 'default' : 'destructive'}
-                  className={team.status === 'available' ? 'bg-green-600' : ''}
+                  className={`text-xs ${team.status === 'available' ? 'bg-green-600' : ''}`}
                 >
                   {team.status}
                 </Badge>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-4 text-sm text-white/80">
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4" />
+              <div className="grid grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4 text-xs md:text-sm text-white/80">
+                <div className="flex items-center space-x-1 md:space-x-2">
+                  <MapPin className="h-3 w-3 md:h-4 md:w-4" />
                   <span>{team.distance} km away</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Clock className="h-4 w-4" />
+                <div className="flex items-center space-x-1 md:space-x-2">
+                  <Clock className="h-3 w-3 md:h-4 md:w-4" />
                   <span>~{Math.round(team.distance * 2)} min ETA</span>
                 </div>
               </div>
 
-              <div className="flex space-x-2">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                 <Button 
                   onClick={() => handleCallTeam(team, false)}
                   disabled={team.status === 'busy'}
-                  className="flex-1 bg-white text-black hover:bg-gray-100"
+                  className="flex-1 bg-white text-black hover:bg-gray-100 text-sm"
                 >
-                  <Phone className="h-4 w-4 mr-2" />
+                  <Phone className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
                   Audio Call
                 </Button>
                 <Button 
                   onClick={() => handleCallTeam(team, true)}
                   disabled={team.status === 'busy'}
-                  className="flex-1 bg-white text-black hover:bg-gray-100"
+                  className="flex-1 bg-white text-black hover:bg-gray-100 text-sm"
                 >
-                  <Video className="h-4 w-4 mr-2" />
+                  <Video className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
                   Video Call
                 </Button>
                 <Button 
                   onClick={onReportEmergency}
                   variant="outline"
-                  className="flex-1 border-white/30 text-white hover:bg-white/10"
+                  className="flex-1 border-white/30 text-white hover:bg-white/10 text-sm"
                 >
                   Send Report
                 </Button>
@@ -217,10 +217,10 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
             </Card>
           ))}
 
-          <div className="pt-4">
+          <div className="pt-2 md:pt-4">
             <Button 
               onClick={onReportEmergency}
-              className="w-full bg-white text-black hover:bg-gray-100 py-3"
+              className="w-full bg-white text-black hover:bg-gray-100 py-2 md:py-3 text-sm md:text-base"
             >
               Submit Detailed Emergency Report
             </Button>

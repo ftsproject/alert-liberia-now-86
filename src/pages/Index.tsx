@@ -91,18 +91,18 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-liberia-blue via-slate-900 to-liberia-blue">
       {/* Header */}
       <header className="bg-white/10 backdrop-blur-md border-b border-white/20 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Shield className="h-8 w-8 text-liberia-red" />
+            <div className="flex items-center space-x-2 md:space-x-3">
+              <Shield className="h-6 w-6 md:h-8 md:w-8 text-liberia-red" />
               <div>
-                <h1 className="text-xl font-bold text-white">Alert Liberia</h1>
+                <h1 className="text-lg md:text-xl font-bold text-white">Alert Liberia</h1>
                 <p className="text-xs text-white/70">Emergency Response</p>
               </div>
             </div>
             <Button 
               onClick={handleEmergencyCall}
-              className="bg-white text-black hover:bg-gray-100 font-bold px-6 py-2 rounded-full animate-pulse"
+              className="bg-white text-black hover:bg-gray-100 font-bold px-3 py-1.5 md:px-6 md:py-2 text-sm md:text-base rounded-full animate-pulse"
             >
               Emergency Call
             </Button>
@@ -112,8 +112,8 @@ const Index = () => {
 
       {/* Location Status */}
       <div className="container mx-auto px-4 py-2">
-        <div className="flex items-center justify-center space-x-2 text-white/80 text-sm">
-          <MapPin className="h-4 w-4" />
+        <div className="flex items-center justify-center space-x-2 text-white/80 text-xs md:text-sm">
+          <MapPin className="h-3 w-3 md:h-4 md:w-4" />
           <span>
             {locationPermission === 'granted' && userLocation 
               ? `Location: ${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`
@@ -126,7 +126,7 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 pb-20">
+      <main className="container mx-auto px-4 pb-20 md:pb-24">
         {currentView === 'home' && (
           <div className="animate-fade-in">
             <EmergencyTypeSelector onSelect={handleEmergencyTypeSelect} />

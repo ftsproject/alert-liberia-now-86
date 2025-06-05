@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { EmergencyType, Location } from '@/pages/Index';
 import { useToast } from '@/hooks/use-toast';
 
@@ -24,7 +23,6 @@ export const ReportForm: React.FC<ReportFormProps> = ({
   onSubmit
 }) => {
   const [description, setDescription] = useState('');
-  const [isAnonymous, setIsAnonymous] = useState(false);
   const [contactInfo, setContactInfo] = useState('');
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -50,7 +48,6 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       type: emergencyType,
       description,
       location: userLocation,
-      anonymous: isAnonymous,
       contact: contactInfo,
       mediaCount: mediaFiles.length,
       timestamp: new Date().toISOString()
@@ -82,37 +79,37 @@ export const ReportForm: React.FC<ReportFormProps> = ({
   };
 
   return (
-    <div className="py-6">
-      <div className="flex items-center mb-6">
+    <div className="py-4 md:py-6">
+      <div className="flex items-center mb-4 md:mb-6">
         <Button 
           variant="ghost" 
           onClick={onBack}
-          className="text-white hover:bg-white/10 mr-4"
+          className="text-white hover:bg-white/10 mr-3 md:mr-4 p-2"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
         </Button>
         <div>
-          <h2 className="text-2xl font-bold text-white capitalize">
+          <h2 className="text-xl md:text-2xl font-bold text-white capitalize">
             {getEmergencyTypeIcon()} Report {emergencyType} Emergency
           </h2>
-          <p className="text-white/70">Provide details to help response teams</p>
+          <p className="text-white/70 text-sm md:text-base">Provide details to help response teams</p>
         </div>
       </div>
 
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 md:p-6">
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
           {/* Location Info */}
-          <div className="bg-white/5 rounded-lg p-4">
+          <div className="bg-white/5 rounded-lg p-3 md:p-4">
             <div className="flex items-center space-x-2 text-white/80 mb-2">
-              <MapPin className="h-4 w-4" />
-              <span className="text-sm font-medium">Location Information</span>
+              <MapPin className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="text-xs md:text-sm font-medium">Location Information</span>
             </div>
             {userLocation ? (
-              <p className="text-white text-sm">
+              <p className="text-white text-xs md:text-sm">
                 Coordinates: {userLocation.lat.toFixed(6)}, {userLocation.lng.toFixed(6)}
               </p>
             ) : (
-              <p className="text-red-300 text-sm">Location not available</p>
+              <p className="text-red-300 text-xs md:text-sm">Location not available</p>
             )}
             <div className="flex items-center space-x-2 text-white/60 mt-1">
               <Clock className="h-3 w-3" />
@@ -122,7 +119,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-white font-medium">
+            <Label htmlFor="description" className="text-white font-medium text-sm md:text-base">
               Emergency Description *
             </Label>
             <Textarea
@@ -130,14 +127,14 @@ export const ReportForm: React.FC<ReportFormProps> = ({
               placeholder="Describe the emergency situation in detail..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="bg-white/10 border-white/30 text-white placeholder:text-white/50 min-h-[120px]"
+              className="bg-white/10 border-white/30 text-white placeholder:text-white/50 min-h-[100px] md:min-h-[120px] text-sm md:text-base"
               required
             />
           </div>
 
           {/* Contact Information */}
           <div className="space-y-2">
-            <Label htmlFor="contact" className="text-white font-medium">
+            <Label htmlFor="contact" className="text-white font-medium text-sm md:text-base">
               Contact Information
             </Label>
             <Input
@@ -146,47 +143,34 @@ export const ReportForm: React.FC<ReportFormProps> = ({
               placeholder="Phone number (optional)"
               value={contactInfo}
               onChange={(e) => setContactInfo(e.target.value)}
-              className="bg-white/10 border-white/30 text-white placeholder:text-white/50"
-              disabled={isAnonymous}
+              className="bg-white/10 border-white/30 text-white placeholder:text-white/50 text-sm md:text-base"
             />
-          </div>
-
-          {/* Anonymous Option */}
-          <div className="flex items-center space-x-3">
-            <Switch
-              id="anonymous"
-              checked={isAnonymous}
-              onCheckedChange={setIsAnonymous}
-            />
-            <Label htmlFor="anonymous" className="text-white">
-              Submit anonymously
-            </Label>
           </div>
 
           {/* Media Upload */}
           <div className="space-y-3">
-            <Label className="text-white font-medium">
+            <Label className="text-white font-medium text-sm md:text-base">
               Attach Media (Optional)
             </Label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 md:gap-3">
               <Button
                 type="button"
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 h-auto py-4"
+                className="border-white/30 text-white hover:bg-white/10 h-auto py-3 md:py-4 text-xs md:text-sm"
                 onClick={() => document.getElementById('photo-upload')?.click()}
               >
-                <Camera className="h-5 w-5 mb-1" />
-                <span className="text-sm">Photo</span>
+                <Camera className="h-4 w-4 md:h-5 md:w-5 mb-1" />
+                <span>Photo</span>
               </Button>
               
               <Button
                 type="button"
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 h-auto py-4"
+                className="border-white/30 text-white hover:bg-white/10 h-auto py-3 md:py-4 text-xs md:text-sm"
                 onClick={() => document.getElementById('audio-upload')?.click()}
               >
-                <Mic className="h-5 w-5 mb-1" />
-                <span className="text-sm">Audio</span>
+                <Mic className="h-4 w-4 md:h-5 md:w-5 mb-1" />
+                <span>Audio</span>
               </Button>
             </div>
             
@@ -209,8 +193,8 @@ export const ReportForm: React.FC<ReportFormProps> = ({
             />
 
             {mediaFiles.length > 0 && (
-              <div className="text-white/80 text-sm">
-                <FileText className="h-4 w-4 inline mr-1" />
+              <div className="text-white/80 text-xs md:text-sm">
+                <FileText className="h-3 w-3 md:h-4 md:w-4 inline mr-1" />
                 {mediaFiles.length} file(s) attached
               </div>
             )}
@@ -220,11 +204,11 @@ export const ReportForm: React.FC<ReportFormProps> = ({
           <Button
             type="submit"
             disabled={submitting || !description.trim()}
-            className="w-full bg-liberia-red hover:bg-liberia-red/90 text-white py-3 text-lg font-semibold"
+            className="w-full bg-liberia-red hover:bg-liberia-red/90 text-white py-2 md:py-3 text-base md:text-lg font-semibold"
           >
             {submitting ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                <div className="animate-spin rounded-full h-3 w-3 md:h-4 md:w-4 border-b-2 border-white mr-2"></div>
                 Submitting Report...
               </>
             ) : (

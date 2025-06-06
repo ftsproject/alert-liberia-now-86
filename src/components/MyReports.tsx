@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Clock, MapPin, AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,100 +12,53 @@ interface Report {
   description: string;
   location: string;
   timestamp: Date;
-  status: 'pending' | 'in-progress' | 'resolved';
-  priority: 'low' | 'medium' | 'high' | 'critical';
 }
 
 interface MyReportsProps {
   onBack: () => void;
 }
 
+const LOCAL_STORAGE_KEY = "alert-liberia-reports";
+
+function loadReportsFromStorage(): Report[] {
+  const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+  if (!raw) return [];
+  try {
+    const arr = JSON.parse(raw);
+    // Convert timestamp back to Date
+    return arr.map((r: any) => ({
+      ...r,
+      timestamp: new Date(r.timestamp),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export const saveReportToStorage = (report: Report) => {
+  const reports = loadReportsFromStorage();
+  reports.unshift(report); // add new report to the top
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(reports));
+};
+
 export const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading reports from storage or API
-    const loadReports = async () => {
-      setLoading(true);
-      
-      // Mock data - in real app this would come from local storage or API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const mockReports: Report[] = [
-        {
-          id: '1',
-          type: 'medical',
-          title: 'Medical Emergency',
-          description: 'Person collapsed at Central Market',
-          location: 'Central Market, Monrovia',
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-          status: 'resolved',
-          priority: 'high'
-        },
-        {
-          id: '2',
-          type: 'fire',
-          title: 'House Fire',
-          description: 'Smoke coming from residential building',
-          location: 'Sinkor District, Monrovia',
-          timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-          status: 'resolved',
-          priority: 'critical'
-        },
-        {
-          id: '3',
-          type: 'police',
-          title: 'Traffic Accident',
-          description: 'Car accident blocking main road',
-          location: 'Broad Street, Monrovia',
-          timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-          status: 'in-progress',
-          priority: 'medium'
-        }
-      ];
-      
-      setReports(mockReports);
+    setLoading(true);
+    setTimeout(() => {
+      setReports(loadReportsFromStorage());
       setLoading(false);
-    };
-
-    loadReports();
+    }, 300);
   }, []);
 
-  const getStatusIcon = (status: Report['status']) => {
-    switch (status) {
-      case 'pending':
-        return <Clock className="h-4 w-4" />;
-      case 'in-progress':
-        return <AlertCircle className="h-4 w-4" />;
-      case 'resolved':
-        return <CheckCircle className="h-4 w-4" />;
-    }
-  };
-
-  const getStatusColor = (status: Report['status']) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-600';
-      case 'in-progress':
-        return 'bg-blue-600';
-      case 'resolved':
-        return 'bg-green-600';
-    }
-  };
-
-  const getPriorityColor = (priority: Report['priority']) => {
-    switch (priority) {
-      case 'low':
-        return 'text-green-400';
-      case 'medium':
-        return 'text-yellow-400';
-      case 'high':
-        return 'text-orange-400';
-      case 'critical':
-        return 'text-red-400';
-    }
-  };
+  // Listen for new reports added from other tabs/windows
+  useEffect(() => {
+    const onStorage = () => setReports(loadReportsFromStorage());
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const getEmergencyTypeColor = (type: EmergencyType) => {
     switch (type) {
@@ -121,18 +73,67 @@ export const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
     }
   };
 
-  const formatTimeAgo = (timestamp: Date) => {
+  const formatDate = (timestamp: string) => {
+    const date = new Date(timestamp);
     const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) {
-      const diffInMinutes = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60));
-      return `${diffInMinutes} minutes ago`;
-    } else if (diffInHours < 24) {
-      return `${diffInHours} hours ago`;
+    const diffMs = now.getTime() - date.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHour = Math.floor(diffMin / 60);
+
+    if (diffSec < 30) {
+      return 'Just now';
+    } else if (diffSec < 60) {
+      return `${diffSec}s ago`;
+    } else if (diffMin < 60) {
+      return `${diffMin}m ago`;
+    } else if (diffHour < 24) {
+      return `${diffHour}h ago`;
     } else {
-      const diffInDays = Math.floor(diffInHours / 24);
-      return `${diffInDays} days ago`;
+      // If not this year, show "Month Day, Year"
+      if (date.getFullYear() !== now.getFullYear()) {
+        return date.toLocaleDateString(undefined, {
+          month: 'long',
+          day: '2-digit',
+          year: 'numeric',
+        });
+      }
+      // If this year, show "Month Day"
+      return date.toLocaleDateString(undefined, {
+        month: 'long',
+        day: '2-digit',
+      });
+    }
+  };
+
+  const formatTimeAgo = (timestamp: Date) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHour = Math.floor(diffMin / 60);
+
+    if (diffSec < 30) {
+      return 'Just now';
+    } else if (diffSec < 60) {
+      return `${diffSec}s ago`;
+    } else if (diffMin < 60) {
+      return `${diffMin}m ago`;
+    } else if (diffHour < 24) {
+      return `${diffHour}h ago`;
+    } else {
+      if (date.getFullYear() !== now.getFullYear()) {
+        return date.toLocaleDateString(undefined, {
+          month: 'long',
+          day: '2-digit',
+          year: 'numeric',
+        });
+      }
+      return date.toLocaleDateString(undefined, {
+        month: 'long',
+        day: '2-digit',
+      });
     }
   };
 
@@ -170,29 +171,13 @@ export const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
         <div className="space-y-3 md:space-y-4">
           {reports.map((report) => (
             <Card key={report.id} className="bg-white/10 backdrop-blur-md border-white/20 p-4 md:p-6">
-              <div className="flex items-start justify-between mb-3 md:mb-4">
-                <div className="flex items-center space-x-2 md:space-x-3">
-                  <Badge className={`${getEmergencyTypeColor(report.type)} text-white text-xs`}>
-                    {report.type}
-                  </Badge>
-                  <Badge 
-                    className={`${getStatusColor(report.status)} text-white text-xs`}
-                  >
-                    <div className="flex items-center space-x-1">
-                      {getStatusIcon(report.status)}
-                      <span>{report.status.replace('-', ' ')}</span>
-                    </div>
-                  </Badge>
-                </div>
-                <div className={`flex items-center space-x-1 ${getPriorityColor(report.priority)}`}>
-                  <AlertTriangle className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="text-xs font-medium capitalize">{report.priority}</span>
-                </div>
+              <div className="flex items-center space-x-2 md:space-x-3 mb-3 md:mb-4">
+                <Badge className={`${getEmergencyTypeColor(report.type)} text-white text-xs`}>
+                  {report.type}
+                </Badge>
               </div>
-
               <h3 className="text-base md:text-lg font-semibold text-white mb-2">{report.title}</h3>
               <p className="text-white/80 text-sm md:text-base mb-3 md:mb-4">{report.description}</p>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3 text-xs md:text-sm text-white/70">
                 <div className="flex items-center space-x-1 md:space-x-2">
                   <MapPin className="h-3 w-3 md:h-4 md:w-4" />

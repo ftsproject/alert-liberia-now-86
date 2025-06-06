@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { EmergencyTypeSelector } from '@/components/EmergencyTypeSelector';
 import { NearestTeams } from '@/components/NearestTeams';
@@ -9,6 +8,8 @@ import { Navigation } from '@/components/Navigation';
 import { Shield, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { NewsDetail } from '@/components/NewsDetail';
+import { InferenceClient } from "@huggingface/inference";
 
 export type EmergencyType = 'police' | 'fire' | 'medical' | 'disaster';
 
@@ -28,6 +29,8 @@ export interface EmergencyTeam {
   location: Location;
 }
 
+const client = new InferenceClient("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");
+
 const Index = () => {
   const [currentView, setCurrentView] = useState<'home' | 'news' | 'my-reports'>('home');
   const [selectedEmergencyType, setSelectedEmergencyType] = useState<EmergencyType | null>(null);
@@ -35,11 +38,49 @@ const Index = () => {
   const [showReportForm, setShowReportForm] = useState(false);
   const [userLocation, setUserLocation] = useState<Location | null>(null);
   const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'pending'>('pending');
+  const [selectedNews, setSelectedNews] = useState<any>(null);
+  const [aiSummary, setAiSummary] = useState<string>("");
   const { toast } = useToast();
 
   useEffect(() => {
     requestLocation();
   }, []);
+
+  // AI summarization using HuggingFace InferenceClient
+  useEffect(() => {
+    let abort = false;
+    const fetchSummary = async () => {
+      if (selectedNews) {
+        setAiSummary("Summarizing...");
+        try {
+          const chatCompletion = await client.chatCompletion({
+            provider: "auto",
+            model: "deepseek-ai/DeepSeek-R1-0528",
+            messages: [
+              {
+                role: "user",
+                content: `Summarize this news article and make it simple and should be all text and no format:\n\n${selectedNews.content}`,
+              },
+            ],
+          });
+
+          if (!abort) {
+            const answer = chatCompletion.choices[0].message.content
+              .replace(/<think>[\s\S]*?<\/think>/gi, '')
+              .replace(/<think>[\\s\\S]*?\\n/gi, '')
+              .trim();
+            setAiSummary(answer || "No summary available.");
+          }
+        } catch {
+          if (!abort) setAiSummary("Failed to summarize.");
+        }
+      } else {
+        setAiSummary("");
+      }
+    };
+    fetchSummary();
+    return () => { abort = true; };
+  }, [selectedNews]);
 
   const requestLocation = () => {
     if ('geolocation' in navigator) {
@@ -83,7 +124,6 @@ const Index = () => {
   };
 
   const handleEmergencyCall = () => {
-    // In a real app, this would call the actual emergency number
     toast({
       title: "Emergency call initiated",
       description: "Calling emergency services...",
@@ -178,9 +218,22 @@ const Index = () => {
           </div>
         )}
 
-        {currentView === 'news' && (
+        {currentView === 'news' && selectedNews && (
           <div className="animate-fade-in">
-            <NewsFeed onBack={() => setCurrentView('home')} />
+            <NewsDetail
+              news={selectedNews}
+              aiSummary={aiSummary}
+              onBack={() => setSelectedNews(null)}
+            />
+          </div>
+        )}
+
+        {currentView === 'news' && !selectedNews && (
+          <div className="animate-fade-in">
+            <NewsFeed
+              onBack={() => setCurrentView('home')}
+              onSelectNews={setSelectedNews}
+            />
           </div>
         )}
 

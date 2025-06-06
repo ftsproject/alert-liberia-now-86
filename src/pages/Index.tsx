@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { EmergencyTypeSelector } from '@/components/EmergencyTypeSelector';
 import { NearestTeams } from '@/components/NearestTeams';
@@ -91,10 +92,7 @@ const Index = () => {
             lng: position.coords.longitude
           });
           setLocationPermission('granted');
-          toast({
-            title: "Location detected",
-            description: "We can now show you the nearest emergency teams.",
-          });
+          // Removed location toast notification
         },
         (error) => {
           console.error('Location error:', error);
@@ -102,7 +100,8 @@ const Index = () => {
           toast({
             title: "Location access denied",
             description: "Please enable location services for better emergency response.",
-            variant: "destructive"
+            variant: "destructive",
+            className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
           });
         }
       );
@@ -117,7 +116,8 @@ const Index = () => {
       toast({
         title: "Location required",
         description: "Please enable location services to find nearby emergency teams.",
-        variant: "destructive"
+        variant: "destructive",
+        className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
       });
       requestLocation();
     }
@@ -127,6 +127,7 @@ const Index = () => {
     toast({
       title: "Emergency call initiated",
       description: "Calling emergency services...",
+      className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
     });
   };
 
@@ -146,6 +147,7 @@ const Index = () => {
     toast({
       title: "Report submitted",
       description: "Your emergency report has been sent to the response team.",
+      className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
     });
     handleBackToHome();
   };
@@ -175,11 +177,11 @@ const Index = () => {
 
       {/* Location Status */}
       <div className="container mx-auto px-4 py-2">
-        <div className="flex items-center justify-center space-x-2 text-white/80 text-xs md:text-sm">
-          <MapPin className="h-3 w-3 md:h-4 md:w-4" />
-          <span>
+        <div className="flex items-center justify-center space-x-2 text-white/80 text-xs md:text-sm overflow-x-auto">
+          <MapPin className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
+          <span className="whitespace-nowrap">
             {locationPermission === 'granted' && userLocation 
-              ? `Location: ${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`
+              ? 'Location detected - Emergency teams nearby'
               : locationPermission === 'denied'
               ? 'Location access denied'
               : 'Detecting location...'

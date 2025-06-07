@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { EmergencyTypeSelector } from '@/components/EmergencyTypeSelector';
 import { NearestTeams } from '@/components/NearestTeams';
@@ -39,6 +38,7 @@ const Index = () => {
   const [showReportForm, setShowReportForm] = useState(false);
   const [userLocation, setUserLocation] = useState<Location | null>(null);
   const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'pending'>('pending');
+  const [locationString, setLocationString] = useState<string>("");
   const [selectedNews, setSelectedNews] = useState<any>(null);
   const [aiSummary, setAiSummary] = useState<string>("");
   const { toast } = useToast();
@@ -46,6 +46,39 @@ const Index = () => {
   useEffect(() => {
     requestLocation();
   }, []);
+
+  // Send/Update user location every 5 seconds
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    const sendLocation = async (lat: number, lng: number, deviceId: string) => {
+      try {
+        await fetch("https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/admin/user-location", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lat, lng, deviceId }),
+        });
+      } catch (e) {
+        // Optionally handle error
+      }
+    };
+
+    if (userLocation && userLocation.lat && userLocation.lng) {
+      const deviceId = localStorage.getItem("deviceId");
+      if (deviceId) {
+        // Send immediately
+        sendLocation(userLocation.lat, userLocation.lng, deviceId);
+        // Then every 5 seconds
+        interval = setInterval(() => {
+          sendLocation(userLocation.lat, userLocation.lng, deviceId);
+        }, 5000);
+      }
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [userLocation]);
 
   // AI summarization using HuggingFace InferenceClient
   useEffect(() => {
@@ -83,20 +116,49 @@ const Index = () => {
     return () => { abort = true; };
   }, [selectedNews]);
 
+  // Update requestLocation to set location string using reverse geocoding
   const requestLocation = () => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          console.log("Latitude:", lat, "Longitude:", lng); // Log lat and long
+          let address = "";
+          let name = "";
+          let neighbourhood = "";
+          try {
+            // Use OpenStreetMap Nominatim for free reverse geocoding
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            );
+            const data = await res.json();
+            address = data.display_name || "";
+            name = data.name || "";
+            neighbourhood = data.address?.neighbourhood || "";
+          } catch {
+            address = "";
+            name = "";
+            neighbourhood = "";
+          }
           setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lat,
+            lng,
+            address,
           });
+          // Use name, then neighbourhood, then display_name
+          let locationLabel = name
+            ? name
+            : neighbourhood
+            ? neighbourhood
+            : address;
+          setLocationString(locationLabel);
           setLocationPermission('granted');
-          // Removed location toast notification
         },
         (error) => {
           console.error('Location error:', error);
           setLocationPermission('denied');
+          setLocationString("");
           toast({
             title: "Location access denied",
             description: "Please enable location services for better emergency response.",
@@ -180,8 +242,8 @@ const Index = () => {
         <div className="flex items-center justify-center space-x-2 text-white/80 text-xs md:text-sm overflow-x-auto">
           <MapPin className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
           <span className="whitespace-nowrap">
-            {locationPermission === 'granted' && userLocation 
-              ? 'Location detected - Emergency teams nearby'
+            {locationPermission === 'granted' && userLocation && locationString
+              ? `Location detected - ${locationString}`
               : locationPermission === 'denied'
               ? 'Location access denied'
               : 'Detecting location...'

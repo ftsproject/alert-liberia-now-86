@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, Camera, Mic, FileText, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,6 +27,48 @@ export const ReportForm: React.FC<ReportFormProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
+  // Upload only 1 media file (either image or video, or none)
+  const uploadMediaFiles = async (files: File[]): Promise<{ imageId?: string; videoId?: string }> => {
+    if (files.length === 0) return {};
+
+    const formData = new FormData();
+    const selectedFile = files[0];
+
+    if (!selectedFile || selectedFile.size === 0) {
+      console.warn("No valid media file to upload.");
+      return {};
+    }
+
+    formData.append('file', selectedFile); // <-- field name is 'file'
+    console.log("Uploading file:", selectedFile.name);
+
+    try {
+      const res = await fetch("https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/media", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      // data.files[0].fileId is the GridFS file id
+      let imageId, videoId;
+      if (data.files && Array.isArray(data.files)) {
+        for (const f of data.files) {
+          if (
+            f.filename &&
+            /\.(jpg|jpeg|png|gif|webp|avif|heic|heif|bmp|tiff|svg|ico)$/i.test(f.filename)
+          ) imageId = f.fileId;
+          if (
+            f.filename &&
+            /\.(mp4|mov|avi|webm|mkv|3gp|3gpp|3gpp2|ogg|mpeg|quicktime|x-msvideo|x-matroska)$/i.test(f.filename)
+          ) videoId = f.fileId;
+        }
+      }
+      return { imageId, videoId };
+    } catch (err) {
+      console.error('Upload failed:', err);
+      return {};
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description.trim()) {
@@ -38,33 +79,86 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       });
       return;
     }
+    if (!userLocation) {
+      toast({
+        title: "Location required",
+        description: "Location information is required to submit a report.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setSubmitting(true);
-    
-    // Simulate API submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    console.log('Emergency report submitted:', {
+
+    // Upload media files (first image and first video only)
+    let imageId = "";
+    let videoId = "";
+    if (mediaFiles.length > 0) {
+      const ids = await uploadMediaFiles(mediaFiles);
+      imageId = ids.imageId || "";
+      videoId = ids.videoId || "";
+    }
+
+    // Prepare payload
+    const payload = {
       type: emergencyType,
       description,
-      location: userLocation,
-      contact: contactInfo,
-      mediaCount: mediaFiles.length,
-      timestamp: new Date().toISOString()
-    });
+      phone: contactInfo,
+      image: imageId,
+      video: videoId,
+      location: {
+        lat: userLocation.lat,
+        lng: userLocation.lng,
+        address: userLocation.address || "",
+      },
+      timestamp: new Date().toISOString(),
+    };
 
-    setSubmitting(false);
-    onSubmit();
+    try {
+      const res = await fetch("https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Failed to submit report");
+      toast({
+        title: "Report submitted",
+        description: "Your emergency report has been sent to the response team.",
+      });
+      setSubmitting(false);
+      onSubmit();
+    } catch {
+      setSubmitting(false);
+      toast({
+        title: "Submission failed",
+        description: "Could not submit your report. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
+  // Only allow one media file (image or video, or none)
   const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const files = Array.from(e.target.files);
-      setMediaFiles(prev => [...prev, ...files]);
-      toast({
-        title: "Media attached",
-        description: `${files.length} file(s) attached to your report.`,
-      });
+      const files = Array.from(e.target.files).filter(f => f.size > 0);
+      if (files.length > 1) {
+        toast({
+          title: "Only one media file allowed",
+          description: "Please select only one photo or video.",
+          variant: "destructive"
+        });
+        // Reset the file input
+        e.target.value = "";
+        setMediaFiles([]);
+        return;
+      }
+      setMediaFiles(files);
+      if (files.length === 1) {
+        toast({
+          title: "Media attached",
+          description: `${files[0].name} attached to your report.`,
+        });
+      }
     }
   };
 
@@ -150,50 +244,54 @@ export const ReportForm: React.FC<ReportFormProps> = ({
           {/* Media Upload */}
           <div className="space-y-3">
             <Label className="text-white font-medium text-sm md:text-base">
-              Attach Media (Optional)
+              Attach Media (Photo or Video, Optional)
             </Label>
-            <div className="grid grid-cols-2 gap-2 md:gap-3">
+            <div className="flex gap-4">
               <Button
                 type="button"
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 h-auto py-3 md:py-4 text-xs md:text-sm"
-                onClick={() => document.getElementById('photo-upload')?.click()}
+                className="flex-1 border-2 border-dashed border-white/60 text-white bg-white/10 hover:bg-white/20 h-20 md:h-24 flex flex-col items-center justify-center transition"
+                onClick={() => document.getElementById('media-upload')?.click()}
               >
-                <Camera className="h-4 w-4 md:h-5 md:w-5 mb-1" />
-                <span>Photo</span>
-              </Button>
-              
-              <Button
-                type="button"
-                variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 h-auto py-3 md:py-4 text-xs md:text-sm"
-                onClick={() => document.getElementById('audio-upload')?.click()}
-              >
-                <Mic className="h-4 w-4 md:h-5 md:w-5 mb-1" />
-                <span>Audio</span>
+                <Camera className="h-6 w-6 md:h-8 md:w-8 mb-2" />
+                <span className="font-semibold text-xs md:text-sm">Add Photo/Video</span>
+                <span className="text-[10px] md:text-xs text-white/60 mt-1">Max 1 file</span>
               </Button>
             </div>
             
             <input
-              id="photo-upload"
+              id="media-upload"
               type="file"
-              accept="image/*,video/*"
-              multiple
-              onChange={handleMediaUpload}
-              className="hidden"
-            />
-            
-            <input
-              id="audio-upload"
-              type="file"
-              accept="audio/*"
-              multiple
+              accept="
+                image/jpeg,
+                image/png,
+                image/gif,
+                image/webp,
+                image/avif,
+                image/heic,
+                image/heif,
+                image/bmp,
+                image/tiff,
+                image/x-icon,
+                image/svg+xml,
+                video/mp4,
+                video/quicktime,
+                video/x-msvideo,
+                video/x-matroska,
+                video/webm,
+                video/3gpp,
+                video/3gpp2,
+                video/ogg,
+                video/mpeg,
+                video/avi,
+                video/mov
+              "
               onChange={handleMediaUpload}
               className="hidden"
             />
 
             {mediaFiles.length > 0 && (
-              <div className="text-white/80 text-xs md:text-sm">
+              <div className="text-white/80 text-xs md:text-sm mt-2">
                 <FileText className="h-3 w-3 md:h-4 md:w-4 inline mr-1" />
                 {mediaFiles.length} file(s) attached
               </div>
@@ -207,7 +305,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
             className="w-full bg-liberia-red hover:bg-liberia-red/90 text-white py-2 md:py-3 text-base md:text-lg font-semibold"
           >
             {submitting ? (
-              <>
+              <> 
                 <div className="animate-spin rounded-full h-3 w-3 md:h-4 md:w-4 border-b-2 border-white mr-2"></div>
                 Submitting Report...
               </>

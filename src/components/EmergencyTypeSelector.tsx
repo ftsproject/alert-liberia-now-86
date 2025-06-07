@@ -13,7 +13,7 @@ const emergencyTypes = [
     type: 'police' as EmergencyType,
     icon: Shield,
     title: 'Police',
-    description: 'Crime, theft, violence, traffic incidents',
+    description: 'Crime, missing persons, violence, traffic incidents',
     color: 'bg-liberia-blue hover:bg-liberia-blue/90',
     textColor: 'text-white'
   },

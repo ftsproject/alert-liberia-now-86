@@ -99,6 +99,10 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       videoId = ids.videoId || "";
     }
 
+    // Get deviceId and permanentToken from localStorage
+    const deviceId = localStorage.getItem("deviceId") || "";
+    const permanentToken = localStorage.getItem("permanentToken") || "";
+
     // Prepare payload
     const payload = {
       type: emergencyType,
@@ -112,6 +116,8 @@ export const ReportForm: React.FC<ReportFormProps> = ({
         address: userLocation.address || "",
       },
       timestamp: new Date().toISOString(),
+      deviceId,           // <-- added
+      permanentToken,     // <-- added
     };
 
     try {

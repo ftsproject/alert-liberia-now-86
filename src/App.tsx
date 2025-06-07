@@ -54,7 +54,8 @@ const App = () => {
       // Welcome back toast
       toast({
         title: "Welcome back!",
-        description: "Glad to see you again.",
+        description: "Hope all is okay with you.",
+        variant: "default",
       });
     }
   }, [toast]);

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Home, FileText, Newspaper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -45,7 +46,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onViewChang
                 className={`flex-col h-auto py-0.5 md:py-0.75 px-1 md:px-1 space-y-0.25 transition-colors ${
                   isActive 
                     ? `${item.color} bg-white/10`
-                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                    : 'text-white/60'
                 }`}
               >
                 <IconComponent

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from 'react';
+=======
+import React, { useState, useEffect } from 'react';
+>>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
 import { EmergencyTypeSelector } from '@/components/EmergencyTypeSelector';
 import { NearestTeams } from '@/components/NearestTeams';
 import { ReportForm } from '@/components/ReportForm';
@@ -10,7 +14,10 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { NewsDetail } from '@/components/NewsDetail';
 import { InferenceClient } from "@huggingface/inference";
+<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
+=======
+>>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
 
 export type EmergencyType = 'police' | 'fire' | 'medical' | 'disaster';
 
@@ -42,12 +49,15 @@ const Index = () => {
   const [locationString, setLocationString] = useState<string>("");
   const [selectedNews, setSelectedNews] = useState<any>(null);
   const [aiSummary, setAiSummary] = useState<string>("");
+<<<<<<< HEAD
   const [showAISolution, setShowAISolution] = useState(false);
   const [lastReport, setLastReport] = useState<{
     description: string;
     location: { lat: number; lng: number; address?: string };
     contact: string;
   } | null>(null);
+=======
+>>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -320,7 +330,11 @@ const Index = () => {
           <div className="animate-fade-in">
             <NewsDetail
               news={selectedNews}
+<<<<<<< HEAD
               aiSummary={cleanSummary(aiSummary)}
+=======
+              aiSummary={aiSummary}
+>>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
               onBack={() => setSelectedNews(null)}
             />
           </div>

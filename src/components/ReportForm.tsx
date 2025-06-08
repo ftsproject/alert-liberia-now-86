@@ -32,6 +32,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
   const [listening, setListening] = useState(false);
   const { toast } = useToast();
 
+<<<<<<< HEAD
   // Convert file to base64 string
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -40,6 +41,48 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
+=======
+  // Upload only 1 media file (either image or video, or none)
+  const uploadMediaFiles = async (files: File[]): Promise<{ imageId?: string; videoId?: string }> => {
+    if (files.length === 0) return {};
+
+    const formData = new FormData();
+    const selectedFile = files[0];
+
+    if (!selectedFile || selectedFile.size === 0) {
+      console.warn("No valid media file to upload.");
+      return {};
+    }
+
+    formData.append('file', selectedFile); // <-- field name is 'file'
+    console.log("Uploading file:", selectedFile.name);
+
+    try {
+      const res = await fetch("https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/media", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      // data.files[0].fileId is the GridFS file id
+      let imageId, videoId;
+      if (data.files && Array.isArray(data.files)) {
+        for (const f of data.files) {
+          if (
+            f.filename &&
+            /\.(jpg|jpeg|png|gif|webp|avif|heic|heif|bmp|tiff|svg|ico)$/i.test(f.filename)
+          ) imageId = f.fileId;
+          if (
+            f.filename &&
+            /\.(mp4|mov|avi|webm|mkv|3gp|3gpp|3gpp2|ogg|mpeg|quicktime|x-msvideo|x-matroska)$/i.test(f.filename)
+          ) videoId = f.fileId;
+        }
+      }
+      return { imageId, videoId };
+    } catch (err) {
+      console.error('Upload failed:', err);
+      return {};
+    }
+>>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,6 +106,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
 
     setSubmitting(true);
 
+<<<<<<< HEAD
     // Convert media file to base64 if present
     let image = "";
     let video = "";
@@ -74,6 +118,15 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       } else if (file.type.startsWith("video/")) {
         video = base64;
       }
+=======
+    // Upload media files (first image and first video only)
+    let imageId = "";
+    let videoId = "";
+    if (mediaFiles.length > 0) {
+      const ids = await uploadMediaFiles(mediaFiles);
+      imageId = ids.imageId || "";
+      videoId = ids.videoId || "";
+>>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
     }
 
     // Get deviceId and permanentToken from localStorage
@@ -85,16 +138,26 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       type: emergencyType,
       description,
       phone: contactInfo,
+<<<<<<< HEAD
       image,
       video,
+=======
+      image: imageId,
+      video: videoId,
+>>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
       location: {
         lat: userLocation.lat,
         lng: userLocation.lng,
         address: userLocation.address || "",
       },
       timestamp: new Date().toISOString(),
+<<<<<<< HEAD
       deviceId,
       permanentToken,
+=======
+      deviceId,           // <-- added
+      permanentToken,     // <-- added
+>>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
     };
 
     try {
@@ -109,6 +172,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
         description: "Your emergency report has been sent to the response team.",
       });
       setSubmitting(false);
+<<<<<<< HEAD
       // Pass info for AI solution page
       onSubmit({
         description,
@@ -119,6 +183,9 @@ export const ReportForm: React.FC<ReportFormProps> = ({
         },
         contact: contactInfo,
       });
+=======
+      onSubmit();
+>>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
     } catch {
       setSubmitting(false);
       toast({
@@ -126,6 +193,34 @@ export const ReportForm: React.FC<ReportFormProps> = ({
         description: "Could not submit your report. Please try again.",
         variant: "destructive"
       });
+<<<<<<< HEAD
+=======
+    }
+  };
+
+  // Only allow one media file (image or video, or none)
+  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files).filter(f => f.size > 0);
+      if (files.length > 1) {
+        toast({
+          title: "Only one media file allowed",
+          description: "Please select only one photo or video.",
+          variant: "destructive"
+        });
+        // Reset the file input
+        e.target.value = "";
+        setMediaFiles([]);
+        return;
+      }
+      setMediaFiles(files);
+      if (files.length === 1) {
+        toast({
+          title: "Media attached",
+          description: `${files[0].name} attached to your report.`,
+        });
+      }
+>>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
     }
   };
 

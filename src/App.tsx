@@ -6,10 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-<<<<<<< HEAD
 import AISurvivalTips from "./pages/AISurvivalTips";
-=======
->>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
 import { useToast } from "@/hooks/use-toast";
 
 const queryClient = new QueryClient();
@@ -69,7 +66,6 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-<<<<<<< HEAD
         <Router>
           <Routes>
             <Route path="/" element={<Index />} />
@@ -78,15 +74,6 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
-=======
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
->>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
       </TooltipProvider>
     </QueryClientProvider>
   );

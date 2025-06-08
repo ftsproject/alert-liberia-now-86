@@ -9,7 +9,6 @@ interface Report {
   _id: string | { $oid: string };
   type: EmergencyType;
   description: string;
-<<<<<<< HEAD
   phone: string;
   image?: string;
   video?: string;
@@ -23,49 +22,17 @@ interface Report {
   deviceId: string;
   createdAt?: string;
   updatedAt?: string;
-=======
-  location: string;
-  timestamp: Date;
->>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
 }
 
 interface MyReportsProps {
   onBack: () => void;
 }
 
-<<<<<<< HEAD
 const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
-=======
-const LOCAL_STORAGE_KEY = "alert-liberia-reports";
-
-function loadReportsFromStorage(): Report[] {
-  const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-  if (!raw) return [];
-  try {
-    const arr = JSON.parse(raw);
-    // Convert timestamp back to Date
-    return arr.map((r: any) => ({
-      ...r,
-      timestamp: new Date(r.timestamp),
-    }));
-  } catch {
-    return [];
-  }
-}
-
-export const saveReportToStorage = (report: Report) => {
-  const reports = loadReportsFromStorage();
-  reports.unshift(report); // add new report to the top
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(reports));
-};
-
-export const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
->>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-<<<<<<< HEAD
     const fetchDeviceReports = async () => {
       setLoading(true);
       const deviceId = localStorage.getItem("deviceId");
@@ -95,22 +62,6 @@ export const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
     fetchDeviceReports();
   }, []);
 
-=======
-    setLoading(true);
-    setTimeout(() => {
-      setReports(loadReportsFromStorage());
-      setLoading(false);
-    }, 300);
-  }, []);
-
-  // Listen for new reports added from other tabs/windows
-  useEffect(() => {
-    const onStorage = () => setReports(loadReportsFromStorage());
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
-
->>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
   const getEmergencyTypeColor = (type: EmergencyType) => {
     switch (type) {
       case 'police':
@@ -124,15 +75,10 @@ export const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
     }
   };
 
-<<<<<<< HEAD
   const formatTimeAgo = (timestamp: string) => {
     if (!timestamp) return "Unknown time";
     const date = new Date(timestamp);
     if (isNaN(date.getTime())) return "Unknown time";
-=======
-  const formatDate = (timestamp: string) => {
-    const date = new Date(timestamp);
->>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffSec = Math.floor(diffMs / 1000);
@@ -148,42 +94,6 @@ export const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
     } else if (diffHour < 24) {
       return `${diffHour}h ago`;
     } else {
-<<<<<<< HEAD
-=======
-      // If not this year, show "Month Day, Year"
-      if (date.getFullYear() !== now.getFullYear()) {
-        return date.toLocaleDateString(undefined, {
-          month: 'long',
-          day: '2-digit',
-          year: 'numeric',
-        });
-      }
-      // If this year, show "Month Day"
-      return date.toLocaleDateString(undefined, {
-        month: 'long',
-        day: '2-digit',
-      });
-    }
-  };
-
-  const formatTimeAgo = (timestamp: Date) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffSec = Math.floor(diffMs / 1000);
-    const diffMin = Math.floor(diffSec / 60);
-    const diffHour = Math.floor(diffMin / 60);
-
-    if (diffSec < 30) {
-      return 'Just now';
-    } else if (diffSec < 60) {
-      return `${diffSec}s ago`;
-    } else if (diffMin < 60) {
-      return `${diffMin}m ago`;
-    } else if (diffHour < 24) {
-      return `${diffHour}h ago`;
-    } else {
->>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
       if (date.getFullYear() !== now.getFullYear()) {
         return date.toLocaleDateString(undefined, {
           month: 'long',
@@ -231,22 +141,13 @@ export const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
       ) : (
         <div className="space-y-3 md:space-y-4">
           {reports.map((report) => (
-<<<<<<< HEAD
             <Card key={typeof report._id === "string" ? report._id : report._id.$oid} className="bg-white/10 backdrop-blur-md border-white/20 p-4 md:p-6">
-=======
-            <Card key={report.id} className="bg-white/10 backdrop-blur-md border-white/20 p-4 md:p-6">
->>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
               <div className="flex items-center space-x-2 md:space-x-3 mb-3 md:mb-4">
                 <Badge className={`${getEmergencyTypeColor(report.type)} text-white text-xs`}>
                   {report.type}
                 </Badge>
-<<<<<<< HEAD
                 <span className="text-xs text-white/70">{report.status}</span>
               </div>
-=======
-              </div>
-              <h3 className="text-base md:text-lg font-semibold text-white mb-2">{report.title}</h3>
->>>>>>> bef381e5fe4603a6ff1ec7043f737418ab57398b
               <p className="text-white/80 text-sm md:text-base mb-3 md:mb-4">{report.description}</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3 text-xs md:text-sm text-white/70">
                 <div className="flex items-center space-x-1 md:space-x-2">

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +16,7 @@ const PERMANENT_TOKEN_KEY = "permanentToken";
 
 const App = () => {
   const { toast } = useToast();
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
     const deviceId = localStorage.getItem(DEVICE_ID_KEY);
@@ -61,6 +62,22 @@ const App = () => {
     }
   }, [toast]);
 
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstallClick = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => setDeferredPrompt(null));
+    }
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -79,6 +96,16 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
+        {deferredPrompt && (
+          <div className="fixed bottom-4 left-0 right-0 flex justify-center z-50">
+            <button
+              onClick={handleInstallClick}
+              className="bg-liberia-blue text-white px-6 py-3 rounded-full shadow-lg font-bold"
+            >
+              Download Alert Liberia App
+            </button>
+          </div>
+        )}
       </TooltipProvider>
     </QueryClientProvider>
   );

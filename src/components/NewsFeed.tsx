@@ -137,6 +137,10 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ onBack, onSelectNews }) => {
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
+        <div>
+          <h2 className="text-xl md:text-2xl font-bold text-white">News Feed</h2>
+          <p className="text-white/70 text-sm md:text-base">Stay updated with the latest news</p>
+        </div>
       </div>
 
       <div className="space-y-4">

@@ -2,6 +2,14 @@ import React from 'react';
 import { Home, FileText, Newspaper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// Modern OS detection utility
+function getOSClass() {
+  const ua = navigator.userAgent;
+  if (/android/i.test(ua)) return 'nav-android';
+  if (/iPad|iPhone|iPod/.test(ua)) return 'nav-ios';
+  return 'nav-desktop';
+}
+
 interface NavigationProps {
   currentView: 'home' | 'news' | 'my-reports';
   onViewChange: (view: 'home' | 'news' | 'my-reports') => void;
@@ -29,8 +37,10 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onViewChang
     },
   ];
 
+  const osClass = getOSClass();
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-md border-t border-white/20 h-16 md:h-18">
+    <nav className={`fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-md border-t border-white/20 h-16 sm:h-18 md:h-20 lg:h-20 ${osClass}`}>
       <div className="container mx-auto px-2 h-full">
         <div className="flex justify-around items-center h-full py-0">
           {navItems.map((item) => {

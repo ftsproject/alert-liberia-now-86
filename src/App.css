@@ -40,3 +40,7 @@
 .read-the-docs {
   color: #888;
 }
+
+.nav-ios { min-height: 68px; }
+.nav-android { min-height: 60px; }
+.nav-desktop { min-height: 56px; }

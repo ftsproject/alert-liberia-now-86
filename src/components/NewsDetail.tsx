@@ -38,7 +38,10 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack, aiSummary 
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h2 className="text-2xl font-bold text-white">News Detail</h2>
+        <div>
+          <h2 className="text-xl md:text-2xl font-bold text-white">News Details</h2>
+          <p className="text-white/70 text-sm md:text-base">Full article with AI Summary below</p>
+        </div>
       </div>
       <h1 className="text-2xl font-bold text-white mb-4">{news.title}</h1>
       <div className="mb-4 text-white/80 whitespace-pre-line">{news.content}</div>

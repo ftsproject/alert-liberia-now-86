@@ -63,9 +63,9 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
         for (let i = event.resultIndex; i < event.results.length; i++) {
           transcript += event.results[i][0].transcript;
         }
-        
-        // Simulate Krio to English translation
-        const translatedText = translateKrioToEnglish(transcript);
+
+        // Simulate Koloqua to English translation
+        const translatedText = translateKoloquaToEnglish(transcript);
         setCaptions(transcript);
         setTranslatedText(translatedText);
       };
@@ -83,9 +83,9 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
     }
   };
 
-  const translateKrioToEnglish = (krioText: string): string => {
-    // Basic Krio to English translation mappings
-    const krioToEnglish: { [key: string]: string } = {
+  const translateKoloquaToEnglish = (koloquaText: string): string => {
+    // Basic Koloqua to English translation mappings
+    const koloquaToEnglish: { [key: string]: string } = {
       'wetin': 'what',
       'na': 'is/are',
       'dem': 'they/them',
@@ -105,10 +105,10 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
       'somebody hurt': 'someone is hurt'
     };
 
-    let translated = krioText.toLowerCase();
-    
-    Object.entries(krioToEnglish).forEach(([krio, english]) => {
-      const regex = new RegExp(`\\b${krio}\\b`, 'gi');
+    let translated = koloquaText.toLowerCase();
+
+    Object.entries(koloquaToEnglish).forEach(([koloqua, english]) => {
+      const regex = new RegExp(`\\b${koloqua}\\b`, 'gi');
       translated = translated.replace(regex, english);
     });
 
@@ -214,7 +214,7 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
           {captions && (
             <div className="space-y-2">
               <div className="text-sm">
-                <span className="text-yellow-400">Krio:</span> {captions}
+                <span className="text-yellow-400">Koloqua:</span> {captions}
               </div>
               {translatedText && (
                 <div className="text-sm">

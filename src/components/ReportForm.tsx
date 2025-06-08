@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, Camera, Mic, FileText, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,7 +12,11 @@ interface ReportFormProps {
   emergencyType: EmergencyType;
   userLocation: Location | null;
   onBack: () => void;
-  onSubmit: () => void;
+  onSubmit: (info: {
+    description: string;
+    location: { lat: number; lng: number; address?: string };
+    contact: string;
+  }) => void;
 }
 
 export const ReportForm: React.FC<ReportFormProps> = ({
@@ -26,7 +29,18 @@ export const ReportForm: React.FC<ReportFormProps> = ({
   const [contactInfo, setContactInfo] = useState('');
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [listening, setListening] = useState(false);
   const { toast } = useToast();
+
+  // Convert file to base64 string
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,34 +52,146 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       });
       return;
     }
+    if (!userLocation) {
+      toast({
+        title: "Location required",
+        description: "Location information is required to submit a report.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setSubmitting(true);
-    
-    // Simulate API submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    console.log('Emergency report submitted:', {
+
+    // Convert media file to base64 if present
+    let image = "";
+    let video = "";
+    if (mediaFiles.length > 0) {
+      const file = mediaFiles[0];
+      const base64 = await fileToBase64(file);
+      if (file.type.startsWith("image/")) {
+        image = base64;
+      } else if (file.type.startsWith("video/")) {
+        video = base64;
+      }
+    }
+
+    // Get deviceId and permanentToken from localStorage
+    const deviceId = localStorage.getItem("deviceId") || "";
+    const permanentToken = localStorage.getItem("permanentToken") || "";
+
+    // Prepare payload
+    const payload = {
       type: emergencyType,
       description,
-      location: userLocation,
-      contact: contactInfo,
-      mediaCount: mediaFiles.length,
-      timestamp: new Date().toISOString()
-    });
+      phone: contactInfo,
+      image,
+      video,
+      location: {
+        lat: userLocation.lat,
+        lng: userLocation.lng,
+        address: userLocation.address || "",
+      },
+      timestamp: new Date().toISOString(),
+      deviceId,
+      permanentToken,
+    };
 
-    setSubmitting(false);
-    onSubmit();
-  };
-
-  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      setMediaFiles(prev => [...prev, ...files]);
+    try {
+      const res = await fetch("https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Failed to submit report");
       toast({
-        title: "Media attached",
-        description: `${files.length} file(s) attached to your report.`,
+        title: "Report submitted",
+        description: "Your emergency report has been sent to the response team.",
+      });
+      setSubmitting(false);
+      // Pass info for AI solution page
+      onSubmit({
+        description,
+        location: {
+          lat: userLocation.lat,
+          lng: userLocation.lng,
+          address: userLocation.address || "",
+        },
+        contact: contactInfo,
+      });
+    } catch {
+      setSubmitting(false);
+      toast({
+        title: "Submission failed",
+        description: "Could not submit your report. Please try again.",
+        variant: "destructive"
       });
     }
+  };
+
+  // Only allow one media file (image or video, or none)
+  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files).filter(f => f.size > 0);
+      if (files.length > 1) {
+        toast({
+          title: "Only one media file allowed",
+          description: "Please select only one photo or video.",
+          variant: "destructive"
+        });
+        // Reset the file input
+        e.target.value = "";
+        setMediaFiles([]);
+        return;
+      }
+      setMediaFiles(files);
+      if (files.length === 1) {
+        toast({
+          title: "Media attached",
+          description: `${files[0].name} attached to your report.`,
+        });
+      }
+    }
+  };
+
+  const handleVoiceInput = () => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      toast({
+        title: "Voice input not supported",
+        description: "Your browser does not support speech recognition.",
+        variant: "destructive"
+      });
+      return;
+    }
+    // @ts-ignore
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setListening(true);
+    recognition.onend = () => setListening(false);
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setDescription(prev => prev ? prev + " " + transcript : transcript);
+      toast({
+        title: "Voice input added",
+        description: "Transcribed speech added to description.",
+      });
+    };
+
+    recognition.onerror = () => {
+      setListening(false);
+      toast({
+        title: "Voice input error",
+        description: "Could not recognize your speech. Please try again.",
+        variant: "destructive"
+      });
+    };
+
+    recognition.start();
   };
 
   const getEmergencyTypeIcon = () => {
@@ -119,9 +245,22 @@ export const ReportForm: React.FC<ReportFormProps> = ({
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-white font-medium text-sm md:text-base">
-              Emergency Description *
-            </Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="description" className="text-white font-medium text-sm md:text-base">
+                Emergency Description *
+              </Label>
+              <Button
+                type="button"
+                size="icon"
+                variant={listening ? "secondary" : "outline"}
+                className={`ml-auto ${listening ? "animate-pulse bg-green-600 text-white" : "bg-white/10 text-white"}`}
+                aria-label="Voice to text"
+                onClick={handleVoiceInput}
+                title="Voice to text"
+              >
+                <Mic className="h-4 w-4" />
+              </Button>
+            </div>
             <Textarea
               id="description"
               placeholder="Describe the emergency situation in detail..."
@@ -130,6 +269,9 @@ export const ReportForm: React.FC<ReportFormProps> = ({
               className="bg-white/10 border-white/30 text-white placeholder:text-white/50 min-h-[100px] md:min-h-[120px] text-sm md:text-base"
               required
             />
+            {listening && (
+              <div className="text-green-400 text-xs mt-1">Listening... Speak now.</div>
+            )}
           </div>
 
           {/* Contact Information */}
@@ -150,50 +292,54 @@ export const ReportForm: React.FC<ReportFormProps> = ({
           {/* Media Upload */}
           <div className="space-y-3">
             <Label className="text-white font-medium text-sm md:text-base">
-              Attach Media (Optional)
+              Attach Media (Photo or Video, Optional)
             </Label>
-            <div className="grid grid-cols-2 gap-2 md:gap-3">
+            <div className="flex gap-4">
               <Button
                 type="button"
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 h-auto py-3 md:py-4 text-xs md:text-sm"
-                onClick={() => document.getElementById('photo-upload')?.click()}
+                className="flex-1 border-2 border-dashed border-white/60 text-white bg-white/10 hover:bg-white/20 h-20 md:h-24 flex flex-col items-center justify-center transition"
+                onClick={() => document.getElementById('media-upload')?.click()}
               >
-                <Camera className="h-4 w-4 md:h-5 md:w-5 mb-1" />
-                <span>Photo</span>
-              </Button>
-              
-              <Button
-                type="button"
-                variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 h-auto py-3 md:py-4 text-xs md:text-sm"
-                onClick={() => document.getElementById('audio-upload')?.click()}
-              >
-                <Mic className="h-4 w-4 md:h-5 md:w-5 mb-1" />
-                <span>Audio</span>
+                <Camera className="h-6 w-6 md:h-8 md:w-8 mb-2" />
+                <span className="font-semibold text-xs md:text-sm">Add Photo/Video</span>
+                <span className="text-[10px] md:text-xs text-white/60 mt-1">Max 1 file</span>
               </Button>
             </div>
             
             <input
-              id="photo-upload"
+              id="media-upload"
               type="file"
-              accept="image/*,video/*"
-              multiple
-              onChange={handleMediaUpload}
-              className="hidden"
-            />
-            
-            <input
-              id="audio-upload"
-              type="file"
-              accept="audio/*"
-              multiple
+              accept="
+                image/jpeg,
+                image/png,
+                image/gif,
+                image/webp,
+                image/avif,
+                image/heic,
+                image/heif,
+                image/bmp,
+                image/tiff,
+                image/x-icon,
+                image/svg+xml,
+                video/mp4,
+                video/quicktime,
+                video/x-msvideo,
+                video/x-matroska,
+                video/webm,
+                video/3gpp,
+                video/3gpp2,
+                video/ogg,
+                video/mpeg,
+                video/avi,
+                video/mov
+              "
               onChange={handleMediaUpload}
               className="hidden"
             />
 
             {mediaFiles.length > 0 && (
-              <div className="text-white/80 text-xs md:text-sm">
+              <div className="text-white/80 text-xs md:text-sm mt-2">
                 <FileText className="h-3 w-3 md:h-4 md:w-4 inline mr-1" />
                 {mediaFiles.length} file(s) attached
               </div>
@@ -207,7 +353,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
             className="w-full bg-liberia-red hover:bg-liberia-red/90 text-white py-2 md:py-3 text-base md:text-lg font-semibold"
           >
             {submitting ? (
-              <>
+              <> 
                 <div className="animate-spin rounded-full h-3 w-3 md:h-4 md:w-4 border-b-2 border-white mr-2"></div>
                 Submitting Report...
               </>

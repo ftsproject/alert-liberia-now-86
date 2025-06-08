@@ -14,84 +14,86 @@ interface NearestTeamsProps {
   onReportEmergency: () => void;
 }
 
+interface UserLocation {
+  userId: string;
+  userRole: string;
+  userTeam: string;
+  userName: string;
+  lat: number;
+  lng: number;
+  deviceId: string;
+  updatedAt: string;
+  distance?: number;
+}
+
+function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number) {
+  // Haversine formula
+  const toRad = (value: number) => (value * Math.PI) / 180;
+  const R = 6371; // km
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 export const NearestTeams: React.FC<NearestTeamsProps> = ({
   emergencyType,
   userLocation,
   onBack,
   onReportEmergency
 }) => {
-  const [teams, setTeams] = useState<EmergencyTeam[]>([]);
+  const [teams, setTeams] = useState<UserLocation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCall, setActiveCall] = useState<{ team: EmergencyTeam; isVideo: boolean } | null>(null);
+  const [activeCall, setActiveCall] = useState<{ team: UserLocation; isVideo: boolean } | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Simulate API call to fetch nearest teams
-    const fetchNearestTeams = async () => {
+    const fetchUserLocations = async () => {
       setLoading(true);
-      
-      // Mock data - in real app this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockTeams: EmergencyTeam[] = [
-        {
-          id: '1',
-          name: 'Central Fire Station',
-          type: 'fire',
-          contact: '+231-555-0001',
-          status: 'available',
-          distance: 1.2,
-          location: { lat: 6.3014, lng: -10.7969 }
-        },
-        {
-          id: '2',
-          name: 'Police Unit 5',
-          type: 'police',
-          contact: '+231-555-0002',
-          status: 'available',
-          distance: 0.8,
-          location: { lat: 6.3024, lng: -10.7959 }
-        },
-        {
-          id: '3',
-          name: 'Mobile Medical Team A',
-          type: 'medical',
-          contact: '+231-555-0003',
-          status: 'busy',
-          distance: 2.1,
-          location: { lat: 6.3004, lng: -10.7979 }
-        },
-        {
-          id: '4',
-          name: 'Disaster Response Unit',
-          type: 'disaster',
-          contact: '+231-555-0004',
-          status: 'available',
-          distance: 1.8,
-          location: { lat: 6.3034, lng: -10.7949 }
-        }
-      ];
+      try {
+        const res = await fetch("/api/admin/user-locations");
+        const data: UserLocation[] = await res.json();
 
-      // Filter teams by emergency type and sort by distance
-      const filteredTeams = mockTeams
-        .filter(team => team.type === emergencyType)
-        .sort((a, b) => a.distance - b.distance);
-      
-      setTeams(filteredTeams);
+        // Filter by userRole matching emergencyType
+        const filtered = data.filter(
+          (u) => u.userRole && u.userRole.toLowerCase() === emergencyType
+        );
+
+        // Calculate distance from userLocation
+        const withDistance = filtered.map((u) => ({
+          ...u,
+          distance:
+            userLocation
+              ? calculateDistance(userLocation.lat, userLocation.lng, u.lat, u.lng)
+              : Infinity,
+        }));
+
+        // Sort by distance
+        withDistance.sort((a, b) => a.distance - b.distance);
+
+        setTeams(withDistance);
+      } catch {
+        setTeams([]);
+      }
       setLoading(false);
     };
 
     if (userLocation) {
-      fetchNearestTeams();
+      fetchUserLocations();
     }
   }, [emergencyType, userLocation]);
 
-  const handleCallTeam = (team: EmergencyTeam, isVideo: boolean = false) => {
+  const handleCallTeam = (team: UserLocation, isVideo: boolean = false) => {
     toast({
       title: `Starting ${isVideo ? 'video' : 'audio'} call`,
-      description: `Connecting you to ${team.name}...`,
+      description: `Connecting you to ${team.userName || team.userTeam}...`,
     });
-    
     setActiveCall({ team, isVideo });
   };
 
@@ -116,7 +118,7 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
   if (activeCall) {
     return (
       <VideoCall
-        teamName={activeCall.team.name}
+        teamName={activeCall.team.userName || activeCall.team.userTeam}
         isVideoCall={activeCall.isVideo}
         onEndCall={handleEndCall}
       />
@@ -164,24 +166,26 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
       ) : (
         <div className="space-y-3 md:space-y-4">
           {teams.map((team) => (
-            <Card key={team.id} className="bg-white/10 backdrop-blur-md border-white/20 p-4 md:p-6">
+            <Card key={team.userId} className="bg-white/10 backdrop-blur-md border-white/20 p-4 md:p-6">
               <div className="flex items-center justify-between mb-3 md:mb-4">
                 <div className="flex items-center space-x-2 md:space-x-3">
-                  <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full ${team.status === 'available' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  <h3 className="text-base md:text-lg font-semibold text-white">{team.name}</h3>
+                  <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full bg-green-500`}></div>
+                  <h3 className="text-base md:text-lg font-semibold text-white">
+                    {team.userName || team.userTeam || "Unknown Team"}
+                  </h3>
                 </div>
                 <Badge 
-                  variant={team.status === 'available' ? 'default' : 'destructive'}
-                  className={`text-xs ${team.status === 'available' ? 'bg-green-600' : ''}`}
+                  variant="default"
+                  className={`text-xs bg-green-600`}
                 >
-                  {team.status}
+                  {team.userRole}
                 </Badge>
               </div>
 
               <div className="grid grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4 text-xs md:text-sm text-white/80">
                 <div className="flex items-center space-x-1 md:space-x-2">
                   <MapPin className="h-3 w-3 md:h-4 md:w-4" />
-                  <span>{team.distance} km away</span>
+                  <span>{team.distance.toFixed(2)} km away</span>
                 </div>
                 <div className="flex items-center space-x-1 md:space-x-2">
                   <Clock className="h-3 w-3 md:h-4 md:w-4" />
@@ -191,16 +195,7 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
 
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                 <Button 
-                  onClick={() => handleCallTeam(team, false)}
-                  disabled={team.status === 'busy'}
-                  className="flex-1 bg-white text-black hover:bg-gray-100 text-sm"
-                >
-                  <Phone className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
-                  Audio Call
-                </Button>
-                <Button 
                   onClick={() => handleCallTeam(team, true)}
-                  disabled={team.status === 'busy'}
                   className="flex-1 bg-white text-black hover:bg-gray-100 text-sm"
                 >
                   <Video className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
@@ -209,7 +204,7 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
                 <Button 
                   onClick={onReportEmergency}
                   variant="outline"
-                  className="flex-1 border-white/30 text-white hover:bg-white/10 text-sm"
+                  className="flex-1 bg-white text-black hover:bg-gray-100 text-sm md:text-base"
                 >
                   Send Report
                 </Button>

@@ -1,15 +1,16 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { EmergencyTypeSelector } from '@/components/EmergencyTypeSelector';
 import { NearestTeams } from '@/components/NearestTeams';
 import { ReportForm } from '@/components/ReportForm';
 import { NewsFeed } from '@/components/NewsFeed';
-import { MyReports } from '@/components/MyReports';
+import MyReports from '@/components/MyReports';
 import { Navigation } from '@/components/Navigation';
 import { Shield, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
+import { NewsDetail } from '@/components/NewsDetail';
+import { InferenceClient } from "@huggingface/inference";
+import { useNavigate } from "react-router-dom";
 
 export type EmergencyType = 'police' | 'fire' | 'medical' | 'disaster';
 
@@ -29,6 +30,8 @@ export interface EmergencyTeam {
   location: Location;
 }
 
+const client = new InferenceClient("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");
+
 const Index = () => {
   const [currentView, setCurrentView] = useState<'home' | 'news' | 'my-reports'>('home');
   const [selectedEmergencyType, setSelectedEmergencyType] = useState<EmergencyType | null>(null);
@@ -36,33 +39,139 @@ const Index = () => {
   const [showReportForm, setShowReportForm] = useState(false);
   const [userLocation, setUserLocation] = useState<Location | null>(null);
   const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'pending'>('pending');
+  const [locationString, setLocationString] = useState<string>("");
+  const [selectedNews, setSelectedNews] = useState<any>(null);
+  const [aiSummary, setAiSummary] = useState<string>("");
+  const [showAISolution, setShowAISolution] = useState(false);
+  const [lastReport, setLastReport] = useState<{
+    description: string;
+    location: { lat: number; lng: number; address?: string };
+    contact: string;
+  } | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     requestLocation();
   }, []);
 
+  // Send/Update user location every 5 seconds
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    const sendLocation = async (lat: number, lng: number, deviceId: string) => {
+      try {
+        await fetch("https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/admin/user-location", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lat, lng, deviceId }),
+        });
+      } catch (e) {
+        // Optionally handle error
+      }
+    };
+
+    if (userLocation && userLocation.lat && userLocation.lng) {
+      const deviceId = localStorage.getItem("deviceId");
+      if (deviceId) {
+        // Send immediately
+        sendLocation(userLocation.lat, userLocation.lng, deviceId);
+        // Then every 5 seconds
+        interval = setInterval(() => {
+          sendLocation(userLocation.lat, userLocation.lng, deviceId);
+        }, 5000);
+      }
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [userLocation]);
+
+  // AI summarization using HuggingFace InferenceClient
+  useEffect(() => {
+    let abort = false;
+    const fetchSummary = async () => {
+      if (selectedNews) {
+        setAiSummary("Summarizing...");
+        try {
+          const chatCompletion = await client.chatCompletion({
+            provider: "auto",
+            model: "deepseek-ai/DeepSeek-R1-0528",
+            messages: [
+              {
+                role: "user",
+                content: `Summarize this news article and make it simple and should be all text and no format:\n\n${selectedNews.content}`,
+              },
+            ],
+          });
+
+          if (!abort) {
+            const answer = chatCompletion.choices[0].message.content
+              .replace(/<think>[\s\S]*?<\/think>/gi, '')
+              .replace(/<think>[\\s\\S]*?\\n/gi, '')
+              .trim();
+            setAiSummary(answer || "No summary available.");
+          }
+        } catch {
+          if (!abort) setAiSummary("Failed to summarize.");
+        }
+      } else {
+        setAiSummary("");
+      }
+    };
+    fetchSummary();
+    return () => { abort = true; };
+  }, [selectedNews]);
+
+  // Update requestLocation to set location string using reverse geocoding
   const requestLocation = () => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          console.log("Latitude:", lat, "Longitude:", lng); // Log lat and long
+          let address = "";
+          let name = "";
+          let neighbourhood = "";
+          try {
+            // Use OpenStreetMap Nominatim for free reverse geocoding
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            );
+            const data = await res.json();
+            address = data.display_name || "";
+            name = data.name || "";
+            neighbourhood = data.address?.neighbourhood || "";
+          } catch {
+            address = "";
+            name = "";
+            neighbourhood = "";
+          }
           setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lat,
+            lng,
+            address,
           });
+          // Use name, then neighbourhood, then display_name
+          let locationLabel = name
+            ? name
+            : neighbourhood
+            ? neighbourhood
+            : address;
+          setLocationString(locationLabel);
           setLocationPermission('granted');
-          toast({
-            title: "Location detected",
-            description: "We can now show you the nearest emergency teams.",
-          });
         },
         (error) => {
           console.error('Location error:', error);
           setLocationPermission('denied');
+          setLocationString("");
           toast({
             title: "Location access denied",
             description: "Please enable location services for better emergency response.",
-            variant: "destructive"
+            variant: "destructive",
+            className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
           });
         }
       );
@@ -77,17 +186,18 @@ const Index = () => {
       toast({
         title: "Location required",
         description: "Please enable location services to find nearby emergency teams.",
-        variant: "destructive"
+        variant: "destructive",
+        className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
       });
       requestLocation();
     }
   };
 
   const handleEmergencyCall = () => {
-    // In a real app, this would call the actual emergency number
     toast({
       title: "Emergency call initiated",
       description: "Calling emergency services...",
+      className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
     });
   };
 
@@ -103,13 +213,40 @@ const Index = () => {
     setShowReportForm(true);
   };
 
-  const handleReportSubmit = () => {
+  const handleReportSubmit = (reportInfo?: {
+    description: string;
+    location: { lat: number; lng: number; address?: string };
+    contact: string;
+  }) => {
     toast({
       title: "Report submitted",
       description: "Your emergency report has been sent to the response team.",
+      className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
     });
-    handleBackToHome();
+    if (reportInfo) {
+      // Use react-router-dom's navigate with state
+      navigate("/AISurvivalTips", {
+        state: {
+          description: reportInfo.description,
+          lat: reportInfo.location.lat,
+          lng: reportInfo.location.lng,
+          address: reportInfo.location.address || "",
+          contact: reportInfo.contact,
+        },
+      });
+      setShowReportForm(false);
+      setShowTeams(false);
+      setCurrentView('home');
+    } else {
+      handleBackToHome();
+    }
   };
+
+  function cleanSummary(text: string) {
+    return text
+      .replace(/[*#]+/g, "") // Remove all * and # characters
+      .replace(/^\s+|\s+$/g, ""); // Trim whitespace
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-liberia-blue via-slate-900 to-liberia-blue">
@@ -136,19 +273,17 @@ const Index = () => {
 
       {/* Location Status */}
       <div className="container mx-auto px-4 py-2">
-        <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex items-center justify-center space-x-2 text-white/80 text-xs md:text-sm">
-            <MapPin className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
-            <span className="truncate">
-              {locationPermission === 'granted' && userLocation 
-                ? `Location detected - Emergency services available`
-                : locationPermission === 'denied'
-                ? 'Location access denied - Enable for better service'
-                : 'Detecting location...'
-              }
-            </span>
-          </div>
-        </ScrollArea>
+        <div className="flex items-center justify-center space-x-2 text-white/80 text-xs md:text-sm overflow-x-auto">
+          <MapPin className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
+          <span className="whitespace-nowrap">
+            {locationPermission === 'granted' && userLocation && locationString
+              ? `Location detected - ${locationString}`
+              : locationPermission === 'denied'
+              ? 'Location access denied'
+              : 'Detecting location...'
+            }
+          </span>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -176,14 +311,27 @@ const Index = () => {
               emergencyType={selectedEmergencyType}
               userLocation={userLocation}
               onBack={() => setShowReportForm(false)}
-              onSubmit={handleReportSubmit}
+              onSubmit={(info) => handleReportSubmit(info)}
             />
           </div>
         )}
 
-        {currentView === 'news' && (
+        {currentView === 'news' && selectedNews && (
           <div className="animate-fade-in">
-            <NewsFeed onBack={() => setCurrentView('home')} />
+            <NewsDetail
+              news={selectedNews}
+              aiSummary={cleanSummary(aiSummary)}
+              onBack={() => setSelectedNews(null)}
+            />
+          </div>
+        )}
+
+        {currentView === 'news' && !selectedNews && (
+          <div className="animate-fade-in">
+            <NewsFeed
+              onBack={() => setCurrentView('home')}
+              onSelectNews={setSelectedNews}
+            />
           </div>
         )}
 

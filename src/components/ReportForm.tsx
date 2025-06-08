@@ -48,7 +48,8 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       toast({
         title: "Description required",
         description: "Please provide a description of the emergency.",
-        variant: "destructive"
+        variant: "destructive",
+        className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
       });
       return;
     }
@@ -56,7 +57,8 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       toast({
         title: "Location required",
         description: "Location information is required to submit a report.",
-        variant: "destructive"
+        variant: "destructive",
+        className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
       });
       return;
     }
@@ -107,6 +109,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       toast({
         title: "Report submitted",
         description: "Your emergency report has been sent to the response team.",
+        className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
       });
       setSubmitting(false);
       // Pass info for AI solution page
@@ -124,7 +127,8 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       toast({
         title: "Submission failed",
         description: "Could not submit your report. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
+        className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
       });
     }
   };
@@ -137,7 +141,8 @@ export const ReportForm: React.FC<ReportFormProps> = ({
         toast({
           title: "Only one media file allowed",
           description: "Please select only one photo or video.",
-          variant: "destructive"
+          variant: "destructive",
+          className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
         });
         // Reset the file input
         e.target.value = "";
@@ -149,6 +154,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
         toast({
           title: "Media attached",
           description: `${files[0].name} attached to your report.`,
+          className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
         });
       }
     }
@@ -159,7 +165,8 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       toast({
         title: "Voice input not supported",
         description: "Your browser does not support speech recognition.",
-        variant: "destructive"
+        variant: "destructive",
+        className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
       });
       return;
     }
@@ -179,6 +186,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       toast({
         title: "Voice input added",
         description: "Transcribed speech added to description.",
+        className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
       });
     };
 
@@ -187,7 +195,8 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       toast({
         title: "Voice input error",
         description: "Could not recognize your speech. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
+        className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
       });
     };
 

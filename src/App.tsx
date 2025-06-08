@@ -58,6 +58,8 @@ const App = () => {
         title: "Welcome back!",
         description: "Hope all is okay with you.",
         variant: "default",
+        duration: 3000,
+        className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
       });
     }
   }, [toast]);
@@ -102,7 +104,7 @@ const App = () => {
               onClick={handleInstallClick}
               className="bg-liberia-blue text-white px-6 py-3 rounded-full shadow-lg font-bold"
             >
-              Download Alert Liberia App
+              Download the Help Na App
             </button>
           </div>
         )}

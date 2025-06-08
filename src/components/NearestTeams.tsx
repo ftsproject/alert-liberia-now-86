@@ -93,6 +93,7 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
     toast({
       title: `Starting ${isVideo ? 'video' : 'audio'} call`,
       description: `Connecting you to ${team.userName || team.userTeam}...`,
+      className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
     });
     setActiveCall({ team, isVideo });
   };
@@ -102,6 +103,7 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
     toast({
       title: "Call ended",
       description: "Call has been disconnected.",
+      className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
     });
   };
 

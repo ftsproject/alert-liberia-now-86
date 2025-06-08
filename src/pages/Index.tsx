@@ -172,7 +172,7 @@ const Index = () => {
             title: "Location access denied",
             description: "Please enable location services for better emergency response.",
             variant: "destructive",
-            className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
+            className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
           });
         }
       );
@@ -188,7 +188,7 @@ const Index = () => {
         title: "Location required",
         description: "Please enable location services to find nearby emergency teams.",
         variant: "destructive",
-        className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
+        className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
       });
       requestLocation();
     }
@@ -198,7 +198,7 @@ const Index = () => {
     toast({
       title: "Emergency call initiated",
       description: "Calling emergency services...",
-      className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
+      className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
     });
   };
 
@@ -222,7 +222,7 @@ const Index = () => {
     toast({
       title: "Report submitted",
       description: "Your emergency report has been sent to the response team.",
-      className: "sm:max-w-md md:max-w-lg lg:max-w-xl"
+      className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
     });
     if (reportInfo) {
       // Use react-router-dom's navigate with state
@@ -258,7 +258,7 @@ const Index = () => {
             <div className="flex items-center space-x-2 md:space-x-3">
               <Shield className="h-6 w-6 md:h-8 md:w-8 text-liberia-red" />
               <div>
-                <h1 className="text-lg md:text-xl font-bold text-white">Alert Liberia</h1>
+                <h1 className="text-lg md:text-xl font-bold text-white">Help Na</h1>
                 <p className="text-xs text-white/70">Emergency Response</p>
               </div>
             </div>

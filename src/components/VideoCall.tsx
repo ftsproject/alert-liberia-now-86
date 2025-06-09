@@ -1,4 +1,12 @@
 import React, { useRef, useState, useEffect } from "react";
+
+// Polyfill for process.nextTick in browser
+if (typeof window !== "undefined" && typeof process === "object" && !process.nextTick) {
+  (process as any).nextTick = function (cb: Function) {
+    return setTimeout(cb, 0);
+  };
+}
+
 import io from "socket.io-client";
 import SimplePeer from "simple-peer";
 
@@ -9,6 +17,9 @@ const VideoCall: React.FC = () => {
   const [callToId, setCallToId] = useState("");
   const [callerId, setCallerId] = useState("");
   const [registered, setRegistered] = useState(false);
+  const [inCall, setInCall] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const myVideo = useRef<HTMLVideoElement>(null);
   const userVideo = useRef<HTMLVideoElement>(null);
   const peerRef = useRef<SimplePeer.Instance | null>(null);
@@ -16,7 +27,8 @@ const VideoCall: React.FC = () => {
   const myStream = useRef<MediaStream | null>(null);
 
   useEffect(() => {
-    // Get user media
+    socketRef.current = io(SOCKET_SERVER_URL);
+
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
@@ -26,25 +38,22 @@ const VideoCall: React.FC = () => {
         }
       })
       .catch((err) => {
-        console.error("Failed to get media:", err);
-        alert("Could not access camera or mic. Please ensure they are not in use.");
+        setError("Could not access camera or mic. Please ensure they are not in use.");
       });
 
-    // Connect socket
-    socketRef.current = io(SOCKET_SERVER_URL);
-
-    // Incoming call
-    socketRef.current.on("incomingCall", ({ from, signalData }) => {
+    // Handler for incoming call
+    const handleIncomingCall = ({ from, signalData }: any) => {
+      if (peerRef.current || inCall) return;
       setCallerId(from);
       if (window.confirm(`${from} is calling you. Accept?`)) {
         const peer = new SimplePeer({
           initiator: false,
-          trickle: false,
+          trickle: true,
           stream: myStream.current!,
         });
 
         peer.on("signal", (data) => {
-          socketRef.current?.emit("answerCall", { to: from, signal: data });
+          socketRef.current?.emit("signal", { to: from, signal: data });
         });
 
         peer.on("stream", (stream) => {
@@ -53,52 +62,70 @@ const VideoCall: React.FC = () => {
           }
         });
 
+        peer.on("error", (err) => {
+          setError("Peer connection error: " + err.message);
+          endCall();
+        });
+
         peer.signal(signalData);
         peerRef.current = peer;
+        setInCall(true);
       }
-    });
+    };
 
-    // Call ended
-    socketRef.current.on("callEnded", () => {
+    // Generic signal handler for both initiator and receiver
+    const handleSignal = ({ signal }: any) => {
+      if (peerRef.current) {
+        try {
+          peerRef.current.signal(signal);
+        } catch (e) {
+          // Ignore duplicate or invalid signals
+        }
+      }
+    };
+
+    const handleCallEnded = () => {
       endCall();
-    });
+    };
 
-    // Cleanup
+    socketRef.current.on("incomingCall", handleIncomingCall);
+    socketRef.current.on("signal", handleSignal);
+    socketRef.current.on("callEnded", handleCallEnded);
+
     return () => {
-      socketRef.current?.disconnect();
+      socketRef.current?.off("incomingCall", handleIncomingCall);
+      socketRef.current?.off("signal", handleSignal);
+      socketRef.current?.off("callEnded", handleCallEnded);
       myStream.current?.getTracks().forEach((track) => track.stop());
       if (peerRef.current) peerRef.current.destroy();
+      socketRef.current?.disconnect();
     };
     // eslint-disable-next-line
-  }, []);
-
-  // Accept call
-  useEffect(() => {
-    if (!socketRef.current) return;
-    socketRef.current.on("callAccepted", (signal: SimplePeer.SignalData) => {
-      peerRef.current?.signal(signal);
-    });
-  }, []);
+  }, [inCall]);
 
   const register = () => {
     if (!myId) return alert("Enter your ID");
     socketRef.current?.emit("register", myId);
     setRegistered(true);
+    setError(null);
   };
 
   const callUser = () => {
     if (!callToId) return alert("Enter the user ID to call");
+    if (!myStream.current) return setError("No media stream available.");
+    if (peerRef.current || inCall) return;
+    setError(null);
+
     const peer = new SimplePeer({
       initiator: true,
-      trickle: false,
-      stream: myStream.current!,
+      trickle: true,
+      stream: myStream.current,
     });
 
     peer.on("signal", (data) => {
-      socketRef.current?.emit("callUser", {
-        userToCall: callToId,
-        from: myId,
-        signalData: data,
+      socketRef.current?.emit("signal", {
+        to: callToId,
+        signal: data,
       });
     });
 
@@ -106,6 +133,11 @@ const VideoCall: React.FC = () => {
       if (userVideo.current) {
         userVideo.current.srcObject = stream;
       }
+    });
+
+    peer.on("error", (err) => {
+      setError("Peer connection error: " + err.message);
+      endCall();
     });
 
     peerRef.current = peer;
@@ -127,11 +159,13 @@ const VideoCall: React.FC = () => {
       socketRef.current?.emit("endCall", { to: callerId });
     }
     setCallerId("");
+    setInCall(false);
   };
 
   return (
     <div>
       <h2>Video Call</h2>
+      {error && <div style={{ color: "red" }}>{error}</div>}
       <div>
         <input
           type="text"
@@ -150,20 +184,34 @@ const VideoCall: React.FC = () => {
           placeholder="Call User ID"
           value={callToId}
           onChange={(e) => setCallToId(e.target.value)}
+          disabled={!registered || inCall}
         />
-        <button onClick={callUser} disabled={!registered}>
+        <button onClick={callUser} disabled={!registered || inCall}>
           Call
         </button>
       </div>
       <div>
-        <button onClick={endCall}>End Call</button>
+        <button onClick={endCall} disabled={!inCall}>
+          End Call
+        </button>
       </div>
       <div>
-        <video ref={myVideo} autoPlay muted playsInline style={{ width: 300, margin: 10, border: "2px solid #ccc" }} />
-        <video ref={userVideo} autoPlay playsInline style={{ width: 300, margin: 10, border: "2px solid #ccc" }} />
+        <video
+          ref={myVideo}
+          autoPlay
+          muted
+          playsInline
+          style={{ width: 300, margin: 10, border: "2px solid #ccc" }}
+        />
+        <video
+          ref={userVideo}
+          autoPlay
+          playsInline
+          style={{ width: 300, margin: 10, border: "2px solid #ccc" }}
+        />
       </div>
     </div>
   );
 };
 
-export {VideoCall} ;
+export { VideoCall };

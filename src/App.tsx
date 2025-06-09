@@ -51,7 +51,7 @@ const App = () => {
 
     const registerDevice = async (deviceId: string, permanentToken: string) => {
       try {
-        await fetch("https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/auth/register-device", {
+        await fetch("https://ltc-backend-tqh5.onrender.com/api/auth/register-device", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ deviceId, permanentToken }),
@@ -63,7 +63,7 @@ const App = () => {
 
     const generateDevice = async () => {
       try {
-        const res = await fetch("https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/auth/generate-device", {
+        const res = await fetch("https://ltc-backend-tqh5.onrender.com/api/auth/generate-device", {
           method: "POST",
         });
         const data = await res.json();

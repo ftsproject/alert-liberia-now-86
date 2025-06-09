@@ -1,5 +1,3 @@
-import React, { useRef, useState, useEffect } from "react";
-
 // Polyfill for process.nextTick in browser
 if (typeof window !== "undefined" && typeof process === "object" && !process.nextTick) {
   (process as any).nextTick = function (cb: Function) {
@@ -7,6 +5,7 @@ if (typeof window !== "undefined" && typeof process === "object" && !process.nex
   };
 }
 
+import React, { useRef, useState, useEffect } from "react";
 import io from "socket.io-client";
 import SimplePeer from "simple-peer";
 

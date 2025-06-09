@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
       events: "events/", // Polyfill events
       util: "util/",     // Polyfill util
+      stream: 'stream-browserify',
     },
   },
   define: {

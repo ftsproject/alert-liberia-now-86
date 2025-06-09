@@ -57,7 +57,7 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
   const fetchUserLocations = async () => {
     setLoading(true);
     try {
-      const res = await fetch("https://ltc-backend-tqh5.onrender.com/api/admin/user-locations");
+      const res = await fetch("https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/admin/user-locations");
       const data: UserLocation[] = await res.json();
 
       // Filter by userRole matching emergencyType

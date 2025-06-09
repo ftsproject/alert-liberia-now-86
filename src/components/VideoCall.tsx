@@ -11,7 +11,7 @@ interface VideoCallProps {
   onEndCall: () => void;
 }
 
-const socket = io('https://ltc-backend-tqh5.onrender.com');
+const socket = io('https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev');
 
 export const VideoCall: React.FC<VideoCallProps> = ({ teamName, onEndCall }) => {
   // Always get deviceId from localStorage

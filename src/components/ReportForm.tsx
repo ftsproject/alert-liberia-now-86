@@ -100,7 +100,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
     };
 
     try {
-      const res = await fetch("https://ltc-backend-tqh5.onrender.com/api/reports", {
+      const res = await fetch("https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/reports", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

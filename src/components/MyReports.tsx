@@ -43,7 +43,7 @@ const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
       }
       try {
         const res = await fetch(
-          `https://ltc-backend-tqh5.onrender.com/api/reports/device/${deviceId}`
+          `https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/reports/device/${deviceId}`
         );
         if (!res.ok) throw new Error("Failed to fetch reports");
         const data = await res.json();

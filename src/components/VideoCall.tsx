@@ -73,7 +73,7 @@ const VideoCall: React.FC = () => {
       }
     };
 
-    // Generic signal handler for both initiator and receiver
+    // Handle all incoming signaling data for both initiator and receiver
     const handleSignal = ({ signal }: any) => {
       if (peerRef.current) {
         try {
@@ -123,9 +123,10 @@ const VideoCall: React.FC = () => {
     });
 
     peer.on("signal", (data) => {
-      socketRef.current?.emit("signal", {
-        to: callToId,
-        signal: data,
+      socketRef.current?.emit("callUser", {
+        userToCall: callToId,
+        from: myId,
+        signalData: data,
       });
     });
 

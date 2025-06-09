@@ -51,6 +51,7 @@ const VideoCall: React.FC = () => {
           stream: myStream.current!,
         });
 
+        // Always emit "signal" for every signal event (answer, ICE, etc.)
         peer.on("signal", (data) => {
           socketRef.current?.emit("signal", { to: from, signal: data });
         });
@@ -121,11 +122,11 @@ const VideoCall: React.FC = () => {
       stream: myStream.current,
     });
 
+    // Always emit "signal" for every signal event (offer, ICE, etc.)
     peer.on("signal", (data) => {
-      socketRef.current?.emit("callUser", {
-        userToCall: callToId,
-        from: myId,
-        signalData: data,
+      socketRef.current?.emit("signal", {
+        to: callToId,
+        signal: data,
       });
     });
 
@@ -138,6 +139,15 @@ const VideoCall: React.FC = () => {
     peer.on("error", (err) => {
       setError("Peer connection error: " + err.message);
       endCall();
+    });
+
+    // Send the initial offer via "callUser" for notification and first signal
+    peer.once("signal", (data) => {
+      socketRef.current?.emit("callUser", {
+        userToCall: callToId,
+        from: myId,
+        signalData: data,
+      });
     });
 
     peerRef.current = peer;

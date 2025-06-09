@@ -50,52 +50,59 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
 }) => {
   const [teams, setTeams] = useState<UserLocation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCall, setActiveCall] = useState<{ team: UserLocation; isVideo: boolean } | null>(null);
+  const [activeCall, setActiveCall] = useState<{ team: UserLocation } | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchUserLocations = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch("/api/admin/user-locations");
-        const data: UserLocation[] = await res.json();
+  // Move fetchUserLocations outside useEffect so it can be reused
+  const fetchUserLocations = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/admin/user-locations");
+      const data: UserLocation[] = await res.json();
 
-        // Filter by userRole matching emergencyType
-        const filtered = data.filter(
-          (u) => u.userRole && u.userRole.toLowerCase() === emergencyType
-        );
+      // Filter by userRole matching emergencyType
+      const filtered = data.filter(
+        (u) => u.userRole && u.userRole.toLowerCase() === emergencyType
+      );
 
-        // Calculate distance from userLocation
-        const withDistance = filtered.map((u) => ({
-          ...u,
-          distance:
-            userLocation
-              ? calculateDistance(userLocation.lat, userLocation.lng, u.lat, u.lng)
-              : Infinity,
-        }));
+      // Calculate distance from userLocation
+      const withDistance = filtered.map((u) => ({
+        ...u,
+        distance:
+          userLocation
+            ? calculateDistance(userLocation.lat, userLocation.lng, u.lat, u.lng)
+            : Infinity,
+      }));
 
-        // Sort by distance
-        withDistance.sort((a, b) => a.distance - b.distance);
+      // Sort by distance
+      withDistance.sort((a, b) => a.distance - b.distance);
 
-        setTeams(withDistance);
-      } catch {
-        setTeams([]);
-      }
-      setLoading(false);
-    };
-
-    if (userLocation) {
-      fetchUserLocations();
+      setTeams(withDistance);
+    } catch {
+      setTeams([]);
     }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (!userLocation) return;
+
+    fetchUserLocations(); // Initial fetch
+
+    const interval = setInterval(() => {
+      fetchUserLocations();
+    }, 10000); // Fetch every 10 seconds
+
+    return () => clearInterval(interval);
   }, [emergencyType, userLocation]);
 
-  const handleCallTeam = (team: UserLocation, isVideo: boolean = false) => {
+  const handleCallTeam = (team: UserLocation) => {
     toast({
-      title: `Starting ${isVideo ? 'video' : 'audio'} call`,
+      title: `Starting video call`,
       description: `Connecting you to ${team.userName || team.userTeam}...`,
       className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
     });
-    setActiveCall({ team, isVideo });
+    setActiveCall({ team });
   };
 
   const handleEndCall = () => {
@@ -121,7 +128,6 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
     return (
       <VideoCall
         teamName={activeCall.team.userName || activeCall.team.userTeam}
-        isVideoCall={activeCall.isVideo}
         onEndCall={handleEndCall}
       />
     );
@@ -197,7 +203,7 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
 
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                 <Button 
-                  onClick={() => handleCallTeam(team, true)}
+                  onClick={() => handleCallTeam(team)}
                   className="flex-1 bg-white text-black hover:bg-gray-100 text-sm"
                 >
                   <Video className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />

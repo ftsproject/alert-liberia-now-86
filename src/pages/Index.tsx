@@ -258,7 +258,7 @@ const Index = () => {
             <div className="flex items-center space-x-2 md:space-x-3">
               <Shield className="h-6 w-6 md:h-8 md:w-8 text-liberia-red" />
               <div>
-                <h1 className="text-lg md:text-xl font-bold text-white">Help Na</h1>
+                <h1 className="text-lg md:text-xl font-bold text-white">Alert Liberia</h1>
                 <p className="text-xs text-white/70">Emergency Response</p>
               </div>
             </div>

@@ -17,6 +17,33 @@ const PERMANENT_TOKEN_KEY = "permanentToken";
 const App = () => {
   const { toast } = useToast();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showiOSBanner, setShowiOSBanner] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [isAppLoading, setIsAppLoading] = useState(true);
+
+  useEffect(() => {
+    // Detect if app is running in standalone mode (PWA installed)
+    const checkStandalone = () => {
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        setIsStandalone(true);
+        return;
+      }
+      if ((window.navigator as any).standalone === true) {
+        setIsStandalone(true);
+        return;
+      }
+      setIsStandalone(false);
+    };
+
+    checkStandalone();
+    window.addEventListener('resize', checkStandalone);
+    window.addEventListener('appinstalled', checkStandalone);
+
+    return () => {
+      window.removeEventListener('resize', checkStandalone);
+      window.removeEventListener('appinstalled', checkStandalone);
+    };
+  }, []);
 
   useEffect(() => {
     const deviceId = localStorage.getItem(DEVICE_ID_KEY);
@@ -51,9 +78,8 @@ const App = () => {
     };
 
     if (!deviceId || !permanentToken) {
-      generateDevice();
+      generateDevice().finally(() => setIsAppLoading(false));
     } else {
-      // Welcome back toast
       toast({
         title: "Welcome back!",
         description: "Hope all is okay with you.",
@@ -61,6 +87,7 @@ const App = () => {
         duration: 3000,
         className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
       });
+      setIsAppLoading(false);
     }
   }, [toast]);
 
@@ -73,12 +100,36 @@ const App = () => {
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
+  useEffect(() => {
+    const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(window.navigator.userAgent);
+    if (isIOS && isSafari && !isStandalone) {
+      setShowiOSBanner(true);
+    } else {
+      setShowiOSBanner(false);
+    }
+  }, [isStandalone]);
+
   const handleInstallClick = () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(() => setDeferredPrompt(null));
     }
   };
+
+  // --- LOADING SCREEN WITH LOGO ---
+  if (isAppLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <img
+          src="/AL.png"
+          alt="Alert Liberia Logo"
+          className="w-24 h-24 animate-bounce"
+          style={{ objectFit: "contain" }}
+        />
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -98,14 +149,23 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
-        {deferredPrompt && (
-          <div className="fixed bottom-4 left-0 right-0 flex justify-center z-50">
+        {/* Android/Chrome PWA Banner */}
+        {deferredPrompt && !isStandalone && (
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 flex justify-center z-50">
             <button
               onClick={handleInstallClick}
               className="bg-liberia-blue text-white px-6 py-3 rounded-full shadow-lg font-bold"
             >
-              Download the Help Na App
+              Download App
             </button>
+          </div>
+        )}
+        {/* iOS/Safari Custom Banner */}
+        {showiOSBanner && !isStandalone && (
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 flex justify-center z-50">
+            <div className="bg-liberia-blue text-white px-6 py-3 rounded-full shadow-lg font-bold text-center">
+              Download App
+            </div>
           </div>
         )}
       </TooltipProvider>

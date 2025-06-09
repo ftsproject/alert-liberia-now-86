@@ -17,6 +17,15 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      events: "events/", // Polyfill events
+      util: "util/",     // Polyfill util
     },
+  },
+  define: {
+    global: 'window', // Polyfill global for browser
+    process: { env: {} }, // Polyfill process for browser
+  },
+  optimizeDeps: {
+    include: ["events", "util"],
   },
 }));

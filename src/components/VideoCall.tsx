@@ -1,38 +1,103 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Video, VideoOff, Mic, MicOff, Phone, PhoneOff, MessageSquare } from 'lucide-react';
+import { Video, VideoOff, Mic, MicOff, PhoneOff, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import io from 'socket.io-client';
+import SimplePeer from 'simple-peer';
 
 interface VideoCallProps {
   teamName: string;
-  isVideoCall: boolean;
   onEndCall: () => void;
 }
 
-export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onEndCall }) => {
-  const [isVideoEnabled, setIsVideoEnabled] = useState(isVideoCall);
+const socket = io('https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev');
+
+export const VideoCall: React.FC<VideoCallProps> = ({ teamName, onEndCall }) => {
+  // Always get deviceId from localStorage
+  const getDeviceId = () => localStorage.getItem('deviceId') || '';
+
+  // Use deviceId from localStorage as myId (socketId)
+  const [myId] = useState<string>(getDeviceId());
+  // callToId and callerId are userId (string, not array)
+  const [callToId, setCallToId] = useState('');
+  const [peer, setPeer] = useState<any>(null);
+  const [callerId, setCallerId] = useState('');
+  const myStreamRef = useRef<MediaStream | null>(null);
+
+  const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [captions, setCaptions] = useState<string>('');
   const [isListening, setIsListening] = useState(false);
   const [translatedText, setTranslatedText] = useState<string>('');
-  
+
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const recognitionRef = useRef<any>(null);
 
+  // Register deviceId as soon as the component mounts
   useEffect(() => {
-    // Initialize video stream
+    if (myId) {
+      socket.emit('register', myId);
+      console.log(`Registered Id: ${myId}`);
+    }
+  }, [myId]);
+
+  useEffect(() => {
     initializeMedia();
-    
-    // Initialize speech recognition for Krio to English translation
     initializeSpeechRecognition();
-    
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        myStreamRef.current = stream;
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+        }
+      })
+      .catch(err => {
+        console.error('Failed to get media:', err);
+        alert("Could not access camera or mic.");
+      });
+
+    socket.on('incomingCall', ({ from, signalData }) => {
+      const accept = window.confirm(`${from} is calling you. Accept?`);
+      if (accept) {
+        const answerPeer = new SimplePeer({
+          initiator: false,
+          trickle: false,
+          stream: myStreamRef.current!
+        });
+
+        answerPeer.on('signal', data => {
+          socket.emit('answerCall', { to: from, signal: data });
+        });
+
+        answerPeer.on('stream', stream => {
+          if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = stream;
+          }
+        });
+
+        answerPeer.signal(signalData);
+        setPeer(answerPeer);
+        setCallerId(from);
+      }
+    });
+
+    socket.on('callAccepted', (signal: any) => {
+      peer?.signal(signal);
+    });
+
+    socket.on('callEnded', () => {
+      endCall();
+    });
+
     return () => {
-      cleanup();
+      socket.off('incomingCall');
+      socket.off('callAccepted');
+      socket.off('callEnded');
     };
-  }, []);
+  }, [peer]);
 
   const initializeMedia = async () => {
     try {
@@ -40,7 +105,6 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
         video: isVideoEnabled,
         audio: isAudioEnabled
       });
-      
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
@@ -53,38 +117,29 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
-      
+
       recognitionRef.current.continuous = true;
       recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'en-LR'; // Liberian English
-      
+      recognitionRef.current.lang = 'en-LR';
+
       recognitionRef.current.onresult = (event: any) => {
         let transcript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
           transcript += event.results[i][0].transcript;
         }
-
-        // Simulate Koloqua to English translation
         const translatedText = translateKoloquaToEnglish(transcript);
         setCaptions(transcript);
         setTranslatedText(translatedText);
       };
 
-      recognitionRef.current.onstart = () => {
-        setIsListening(true);
-      };
+      recognitionRef.current.onstart = () => setIsListening(true);
+      recognitionRef.current.onend = () => setIsListening(false);
 
-      recognitionRef.current.onend = () => {
-        setIsListening(false);
-      };
-
-      // Start listening
       recognitionRef.current.start();
     }
   };
 
   const translateKoloquaToEnglish = (koloquaText: string): string => {
-    // Basic Koloqua to English translation mappings
     const koloquaToEnglish: { [key: string]: string } = {
       'wetin': 'what',
       'na': 'is/are',
@@ -102,16 +157,38 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
       'emergency dae': 'there is an emergency',
       'help we': 'help us',
       'fire dae burn': 'there is a fire',
-      'somebody hurt': 'someone is hurt'
+      'somebody hurt': 'someone is hurt',
+      'small small': 'slowly',
+      'chop': 'eat/food',
+      'ya': 'please',
+      'no vex': 'don’t be angry',
+      'fine boy': 'handsome boy',
+      'fine geh': 'beautiful girl',
+      'palava': 'problem',
+      'wahala': 'trouble',
+      'abi': 'right?/isn’t it?',
+      'e don tay': 'it’s been a while',
+      'carry go': 'take it away',
+      'dash me': 'give me (for free)',
+      'make we go': 'let’s go',
+      'I dey come': 'I am coming',
+      'I no sabi': 'I don’t know',
+      'I sabi': 'I know',
+      'I beg': 'please',
+      'no wahala': 'no problem',
+      'I dey': 'I am here',
+      'I wan chop': 'I want to eat',
+      'I go come': 'I will come',
+      'I dey go': 'I am going',
+      'I dey vex': 'I am angry',
+      'I dey happy': 'I am happy'
     };
 
     let translated = koloquaText.toLowerCase();
-
     Object.entries(koloquaToEnglish).forEach(([koloqua, english]) => {
       const regex = new RegExp(`\\b${koloqua}\\b`, 'gi');
       translated = translated.replace(regex, english);
     });
-
     return translated.charAt(0).toUpperCase() + translated.slice(1);
   };
 
@@ -142,10 +219,58 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
       const stream = localVideoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach(track => track.stop());
     }
-    
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
+  };
+
+  // Call userId (not deviceId)
+  const callUser = () => {
+    if (!myId) {
+      alert("No deviceId found in localStorage. Cannot make a call.");
+      return;
+    }
+    if (!callToId) return alert("Enter the user ID to call");
+
+    // Register before calling (in case not registered yet)
+    socket.emit('register', myId);
+
+    const callPeer = new SimplePeer({
+      initiator: true,
+      trickle: false,
+      stream: myStreamRef.current!
+    });
+
+    callPeer.on('signal', data => {
+      socket.emit('callUser', {
+        userToCall: callToId, // userId
+        from: myId,           // deviceId as socketId
+        signalData: data
+      });
+    });
+
+    callPeer.on('stream', stream => {
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = stream;
+      }
+    });
+
+    setPeer(callPeer);
+    setCallerId(callToId);
+  };
+
+  const endCall = () => {
+    if (peer) {
+      peer.destroy();
+      setPeer(null);
+    }
+    if (remoteVideoRef.current?.srcObject) {
+      // @ts-ignore
+      remoteVideoRef.current.srcObject.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+      // @ts-ignore
+      remoteVideoRef.current.srcObject = null;
+    }
+    socket.emit('endCall', { to: callerId });
   };
 
   const handleEndCall = () => {
@@ -158,48 +283,32 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
       {/* Header */}
       <div className="bg-liberia-blue text-white p-4 flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Emergency Call</h2>
+          <h2 className="text-lg font-semibold">Emergency Video Call</h2>
           <p className="text-sm text-white/80">{teamName}</p>
         </div>
-        <Badge className="bg-green-500">
-          Connected
-        </Badge>
+        <Badge className="bg-green-500">Connected</Badge>
       </div>
 
       {/* Video Area */}
       <div className="flex-1 relative">
-        {isVideoCall && (
-          <>
-            {/* Remote Video */}
-            <video
-              ref={remoteVideoRef}
-              autoPlay
-              playsInline
-              className="w-full h-full object-cover"
-            />
-            
-            {/* Local Video (Picture-in-Picture) */}
-            <div className="absolute top-4 right-4 w-32 h-24 bg-gray-800 rounded-lg overflow-hidden">
-              <video
-                ref={localVideoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </>
-        )}
-        
-        {!isVideoCall && (
-          <div className="flex items-center justify-center h-full bg-liberia-blue">
-            <div className="text-center text-white">
-              <Phone className="h-16 w-16 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Audio Call</h3>
-              <p className="text-white/80">{teamName}</p>
-            </div>
-          </div>
-        )}
+        {/* Remote Video */}
+        <video
+          ref={remoteVideoRef}
+          autoPlay
+          playsInline
+          className="w-full h-full object-cover"
+        />
+
+        {/* Local Video (Picture-in-Picture) */}
+        <div className="absolute top-4 right-4 w-32 h-24 bg-gray-800 rounded-lg overflow-hidden">
+          <video
+            ref={localVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover"
+          />
+        </div>
 
         {/* Captions Panel */}
         <Card className="absolute bottom-20 left-4 right-4 bg-black/80 backdrop-blur-md border-white/20 text-white p-4">
@@ -210,7 +319,6 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
             )}
           </div>
-          
           {captions && (
             <div className="space-y-2">
               <div className="text-sm">
@@ -223,7 +331,6 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
               )}
             </div>
           )}
-          
           {!captions && (
             <p className="text-white/60 text-sm">Listening for speech...</p>
           )}
@@ -232,45 +339,55 @@ export const VideoCall: React.FC<VideoCallProps> = ({ teamName, isVideoCall, onE
 
       {/* Controls */}
       <div className="bg-black/90 p-6">
-        <div className="flex justify-center space-x-6">
-          {isVideoCall && (
+        <div className="flex flex-col items-center space-y-4">
+          <div className="flex justify-center space-x-6">
             <Button
               onClick={toggleVideo}
               variant="outline"
               size="lg"
               className={`w-14 h-14 rounded-full border-2 ${
-                isVideoEnabled 
-                  ? 'bg-white text-black border-white hover:bg-gray-100' 
+                isVideoEnabled
+                  ? 'bg-white text-black border-white hover:bg-gray-100'
                   : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
               }`}
             >
               {isVideoEnabled ? <Video className="h-6 w-6" /> : <VideoOff className="h-6 w-6" />}
             </Button>
-          )}
-          
-          <Button
-            onClick={toggleAudio}
-            variant="outline"
-            size="lg"
-            className={`w-14 h-14 rounded-full border-2 ${
-              isAudioEnabled 
-                ? 'bg-white text-black border-white hover:bg-gray-100' 
-                : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
-            }`}
-          >
-            {isAudioEnabled ? <Mic className="h-6 w-6" /> : <MicOff className="h-6 w-6" />}
-          </Button>
-          
-          <Button
-            onClick={handleEndCall}
-            variant="outline"
-            size="lg"
-            className="w-14 h-14 rounded-full bg-red-600 text-white border-red-600 hover:bg-red-700"
-          >
-            <PhoneOff className="h-6 w-6" />
-          </Button>
+            <Button
+              onClick={toggleAudio}
+              variant="outline"
+              size="lg"
+              className={`w-14 h-14 rounded-full border-2 ${
+                isAudioEnabled
+                  ? 'bg-white text-black border-white hover:bg-gray-100'
+                  : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
+              }`}
+            >
+              {isAudioEnabled ? <Mic className="h-6 w-6" /> : <MicOff className="h-6 w-6" />}
+            </Button>
+            <Button
+              onClick={handleEndCall}
+              variant="outline"
+              size="lg"
+              className="w-14 h-14 rounded-full bg-red-600 text-white border-red-600 hover:bg-red-700"
+            >
+              <PhoneOff className="h-6 w-6" />
+            </Button>
+          </div>
+
+          {/* WebRTC Manual Controls */}
+          <div className="flex flex-wrap gap-2 mt-4">
+            <input
+              type="text"
+              placeholder="Call User ID"
+              value={callToId}
+              onChange={e => setCallToId(e.target.value)}
+              className="px-2 py-1 rounded"
+            />
+            <button onClick={callUser} className="bg-green-600 text-white px-3 py-1 rounded">Call</button>
+            <button onClick={endCall} className="bg-red-600 text-white px-3 py-1 rounded">End Call</button>
+          </div>
         </div>
-        
         <p className="text-center text-white/60 text-sm mt-4">
           Tap controls to toggle video/audio
         </p>

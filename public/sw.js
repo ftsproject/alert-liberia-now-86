@@ -1,5 +1,5 @@
 const CACHE_NAME = 'api-cache-v1-LTC';
-const API_URL_PREFIX = 'https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/';
+const API_URL_PREFIX = 'https://ltc-backend-tqh5.onrender.com/api/';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

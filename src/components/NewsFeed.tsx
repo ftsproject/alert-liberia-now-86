@@ -43,7 +43,7 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ onBack, onSelectNews }) => {
 
     const fetchNewsAndAuthors = async () => {
       try {
-        const res = await axios.get<ApiNewsItem[]>('https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/news');
+        const res = await axios.get<ApiNewsItem[]>('https://ltc-backend-tqh5.onrender.com/api/news');
         const newsData = res.data;
 
         // Get unique author IDs
@@ -52,7 +52,7 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ onBack, onSelectNews }) => {
         // Fetch all authors in parallel
         const authorResponses = await Promise.all(
           authorIds.map(id =>
-            axios.get<ApiUser>(`https://sturdy-broccoli-x647p9gqjxrhvqrp-5000.app.github.dev/api/auth/users/${id}`)
+            axios.get<ApiUser>(`https://ltc-backend-tqh5.onrender.com/api/auth/users/${id}`)
               .then(res => ({ id, user: res.data }))
               .catch(() => ({ id, user: { _id: id, name: "Unknown" } }))
           )

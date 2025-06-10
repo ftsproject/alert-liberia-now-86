@@ -186,7 +186,7 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
                 </div>
                 <div className="flex items-center space-x-1 md:space-x-2">
                   <Clock className="h-3 w-3 md:h-4 md:w-4" />
-                  <span>~{Math.round(team.distance * 2)} min ETA</span>
+                  <span>{Math.round(team.distance * 2)} min Away</span>
                 </div>
               </div>
 

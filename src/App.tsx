@@ -9,7 +9,7 @@ import NotFound from "./pages/NotFound";
 import AISurvivalTips from "./pages/AISurvivalTips";
 import { useToast } from "@/hooks/use-toast";
 import { io } from "socket.io-client";
-S
+
 const queryClient = new QueryClient();
 
 const DEVICE_ID_KEY = "deviceId";

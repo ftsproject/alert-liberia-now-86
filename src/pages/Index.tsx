@@ -11,7 +11,6 @@ import { useToast } from '@/hooks/use-toast';
 import { NewsDetail } from '@/components/NewsDetail';
 import { InferenceClient } from "@huggingface/inference";
 import { useNavigate } from "react-router-dom";
-import { VideoCall } from '@/components/VideoCall';
 
 export type EmergencyType = 'police' | 'fire' | 'medical' | 'disaster';
 
@@ -30,7 +29,6 @@ export interface EmergencyTeam {
   distance: number;
   location: Location;
 }
-
 const client = new InferenceClient("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");
 
 const Index = () => {

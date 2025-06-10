@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmergencyType, Location, EmergencyTeam } from '@/pages/Index';
-import { VideoCall } from '@/components/VideoCall';
 import { useToast } from '@/hooks/use-toast';
 
 interface NearestTeamsProps {
@@ -42,6 +41,13 @@ function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: numbe
   return R * c;
 }
 
+// Add this function above your component
+const openCallPageWithId = (callId: string) => {
+  console.log('Opening call page with ID:', callId);
+  const url = `https://socket-backend-lta.onrender.com/?callId=${encodeURIComponent(callId)}`;
+  window.open(url, '_blank');
+};
+
 export const NearestTeams: React.FC<NearestTeamsProps> = ({
   emergencyType,
   userLocation,
@@ -50,7 +56,6 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
 }) => {
   const [teams, setTeams] = useState<UserLocation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCall, setActiveCall] = useState<{ team: UserLocation } | null>(null);
   const { toast } = useToast();
 
   // Move fetchUserLocations outside useEffect so it can be reused
@@ -96,22 +101,15 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
     return () => clearInterval(interval);
   }, [emergencyType, userLocation]);
 
+  // Replace handleCallTeam with this:
   const handleCallTeam = (team: UserLocation) => {
     toast({
-      title: `Starting video call`,
+      title: `Opening video call`,
       description: `Connecting you to ${team.userName || team.userTeam}...`,
       className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
     });
-    setActiveCall({ team });
-  };
-
-  const handleEndCall = () => {
-    setActiveCall(null);
-    toast({
-      title: "Call ended",
-      description: "Call has been disconnected.",
-      className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
-    });
+    // Use the userId string as-is for callId
+    openCallPageWithId(team.userId);
   };
 
   const getEmergencyTypeColor = (type: EmergencyType) => {
@@ -123,15 +121,6 @@ export const NearestTeams: React.FC<NearestTeamsProps> = ({
       default: return 'text-gray-600';
     }
   };
-
-  if (activeCall) {
-    return (
-      <VideoCall
-        teamName={activeCall.team.userName || activeCall.team.userTeam}
-        onEndCall={handleEndCall}
-      />
-    );
-  }
 
   return (
     <div className="py-4 md:py-6">

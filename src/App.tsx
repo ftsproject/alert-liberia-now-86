@@ -8,11 +8,15 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AISurvivalTips from "./pages/AISurvivalTips";
 import { useToast } from "@/hooks/use-toast";
-
+import { io } from "socket.io-client";
+S
 const queryClient = new QueryClient();
 
 const DEVICE_ID_KEY = "deviceId";
 const PERMANENT_TOKEN_KEY = "permanentToken";
+
+const socket = io("https://socket-backend-lta.onrender.com");
+
 
 const App = () => {
   const { toast } = useToast();
@@ -20,6 +24,8 @@ const App = () => {
   const [showiOSBanner, setShowiOSBanner] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [isAppLoading, setIsAppLoading] = useState(true);
+  const [callerId, setCallerId] = useState<string | null>(null);
+  const [showCallInterface, setShowCallInterface] = useState(false);
 
   useEffect(() => {
     // Detect if app is running in standalone mode (PWA installed)
@@ -46,8 +52,17 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    const userId = localStorage.getItem(DEVICE_ID_KEY);
+    console.log("User ID from localStorage:", userId);
+    socket.emit('register', userId);
+    console.log("Socket registered with user ID:", userId);
+  }, []);
+
+  useEffect(() => {
     const deviceId = localStorage.getItem(DEVICE_ID_KEY);
     const permanentToken = localStorage.getItem(PERMANENT_TOKEN_KEY);
+    const userId = deviceId;
+    socket.emit('register', userId);
 
     const registerDevice = async (deviceId: string, permanentToken: string) => {
       try {
@@ -116,6 +131,26 @@ const App = () => {
       deferredPrompt.userChoice.then(() => setDeferredPrompt(null));
     }
   };
+
+  useEffect(() => {
+    socket.on('incoming-call', ({ fromUserId }) => {
+
+      const accept = window.confirm(`${fromUserId} is calling you. Accept?`);
+
+
+      if (!accept) return;
+
+      setCallerId(fromUserId);
+      setShowCallInterface(true);
+
+      const url = `https://socket-backend-lta.onrender.com/?callId=${encodeURIComponent(fromUserId)}`;
+      window.open(url, '_blank');
+    });
+
+    return () => {
+      socket.off('incoming-call');
+    };
+  }, []);
 
   // --- LOADING SCREEN WITH LOGO ---
   if (isAppLoading) {

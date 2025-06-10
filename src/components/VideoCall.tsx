@@ -11,6 +11,15 @@ import SimplePeer from "simple-peer";
 
 const SOCKET_SERVER_URL = "https://ltc-backend-tqh5.onrender.com";
 
+// Helper to robustly attach a stream to a video element
+function attachStream(videoRef: React.RefObject<HTMLVideoElement>, stream: MediaStream) {
+  if (videoRef.current) {
+    videoRef.current.srcObject = stream;
+  } else {
+    setTimeout(() => attachStream(videoRef, stream), 100);
+  }
+}
+
 const VideoCall: React.FC = () => {
   const [myId, setMyId] = useState("");
   const [callToId, setCallToId] = useState("");
@@ -32,9 +41,7 @@ const VideoCall: React.FC = () => {
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
         myStream.current = stream;
-        if (myVideo.current) {
-          myVideo.current.srcObject = stream;
-        }
+        attachStream(myVideo, stream);
       })
       .catch((err) => {
         setError("Could not access camera or mic. Please ensure they are not in use.");
@@ -49,17 +56,21 @@ const VideoCall: React.FC = () => {
           initiator: false,
           trickle: true,
           stream: myStream.current!,
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' }
+              // Add TURN here for production
+            ]
+          }
         });
 
-        // Always emit "signal" for every signal event (answer, ICE, etc.)
+        // All signals (answer, ICE) go through "signal"
         peer.on("signal", (data) => {
           socketRef.current?.emit("signal", { to: from, signal: data });
         });
 
         peer.on("stream", (stream) => {
-          if (userVideo.current) {
-            userVideo.current.srcObject = stream;
-          }
+          attachStream(userVideo, stream);
         });
 
         peer.on("error", (err) => {
@@ -120,34 +131,40 @@ const VideoCall: React.FC = () => {
       initiator: true,
       trickle: true,
       stream: myStream.current,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' }
+          // Add TURN here for production
+        ]
+      }
     });
 
-    // Always emit "signal" for every signal event (offer, ICE, etc.)
+    // Only send the initial offer via "callUser"
+    let offerSent = false;
     peer.on("signal", (data) => {
-      socketRef.current?.emit("signal", {
-        to: callToId,
-        signal: data,
-      });
+      if (!offerSent) {
+        socketRef.current?.emit("callUser", {
+          userToCall: callToId,
+          from: myId,
+          signalData: data,
+        });
+        offerSent = true;
+      } else {
+        // All other signals (ICE) go through "signal"
+        socketRef.current?.emit("signal", {
+          to: callToId,
+          signal: data,
+        });
+      }
     });
 
     peer.on("stream", (stream) => {
-      if (userVideo.current) {
-        userVideo.current.srcObject = stream;
-      }
+      attachStream(userVideo, stream);
     });
 
     peer.on("error", (err) => {
       setError("Peer connection error: " + err.message);
       endCall();
-    });
-
-    // Send the initial offer via "callUser" for notification and first signal
-    peer.once("signal", (data) => {
-      socketRef.current?.emit("callUser", {
-        userToCall: callToId,
-        from: myId,
-        signalData: data,
-      });
     });
 
     peerRef.current = peer;

@@ -193,6 +193,8 @@ const Index = () => {
   };
 
   const handleEmergencyCall = () => {
+    // Open phone dialer with 4455
+    window.location.href = "tel:4455";
     toast({
       title: "Emergency call initiated",
       description: "Calling emergency services...",

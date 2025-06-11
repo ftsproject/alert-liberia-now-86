@@ -6,7 +6,11 @@ const client = new InferenceClient("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");
 
 const cleanText = (text: string) =>
   text
-    .replace(/[*#_`>]+/g, ""); // Remove *, #, _, `, > characters
+    .replace(/[*#_`>]+/g, "") // Remove *, #, _, `, > characters
+    .replace(/\n{2,}/g, "\n") // Collapse multiple newlines
+    .replace(/(\d+\.)/g, "\n $1") // Add a blank line before each numbered point
+    .replace(/\n\s*\n/g, "\n\n") // Ensure double line breaks between points
+    .replace(/^\s+|\s+$/g, ""); // Trim whitespace
 
 const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([
@@ -61,19 +65,14 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-      <div
-        className="bg-gradient-to-br from-liberia-blue via-slate-900 to-liberia-blue rounded-t-2xl shadow-xl w-full max-w-sm m-0 flex flex-col"
-        style={{
-          height: "100dvh", // Dynamic viewport height for mobile keyboard
-          maxHeight: "100dvh",
-        }}
-      >
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-end">
+      <div className="bg-gradient-to-br from-liberia-blue via-slate-900 to-liberia-blue rounded-t-2xl shadow-xl w-full max-w-sm p-0 m-4 flex flex-col">
         <div className="flex justify-between items-center px-4 pt-4 pb-2 border-b border-white/10">
           <h2 className="font-bold text-lg text-white">Alert Liberia AI</h2>
           <Button size="sm" variant="ghost" onClick={onClose} className="text-white">Close</Button>
         </div>
-        <div className="flex-1 overflow-y-auto px-4 py-2 bg-white/5">
+        {/* Set a fixed height and overflow-y-auto for scrollable chat area */}
+        <div className="h-80 overflow-y-auto px-4 py-2 bg-white/5">
           {messages.map((msg, idx) => (
             <div
               key={idx}
@@ -100,8 +99,6 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleInputKeyDown}
             disabled={loading}
-            // This helps on iOS to keep input above keyboard
-            style={{ WebkitUserSelect: "text" }}
           />
           <Button
             onClick={sendMessage}

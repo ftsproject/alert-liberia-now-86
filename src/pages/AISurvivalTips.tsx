@@ -8,7 +8,10 @@ const client = new InferenceClient("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");
 function cleanTips(text: string) {
   // Remove markdown formatting: *, **, ###, ##, #, and leading/trailing whitespace
   return text
-    .replace(/[*#]+/g, "") // Remove all * and # characters
+    .replace(/[*#_`>]+/g, "") // Remove *, #, _, `, > characters
+    .replace(/\n{2,}/g, "\n") // Collapse multiple newlines
+    .replace(/(\d+\.)/g, "\n $1") // Add a blank line before each numbered point
+    .replace(/\n\s*\n/g, "\n\n") // Ensure double line breaks between points
     .replace(/^\s+|\s+$/g, ""); // Trim whitespace
 }
 

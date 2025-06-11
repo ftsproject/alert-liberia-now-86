@@ -26,13 +26,13 @@ function resetViewportScale() {
     // Reset the scale to 1.0
     viewport.setAttribute(
       'content',
-      'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'
+      'width=device-width, initial-scale=0.8, maximum-scale=0.8, user-scalable=0'
     );
     // Allow user to zoom again after a short delay
     setTimeout(() => {
       viewport.setAttribute(
         'content',
-        'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1'
+        'width=device-width, initial-scale=0.8, maximum-scale=0.8, user-scalable=0'
       );
     }, 300);
   }

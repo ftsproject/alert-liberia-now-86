@@ -19,6 +19,25 @@ interface ReportFormProps {
   }) => void;
 }
 
+// Add this helper function at the top (outside your component)
+function resetViewportScale() {
+  const viewport = document.querySelector('meta[name=viewport]');
+  if (viewport) {
+    // Reset the scale to 1.0
+    viewport.setAttribute(
+      'content',
+      'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'
+    );
+    // Allow user to zoom again after a short delay
+    setTimeout(() => {
+      viewport.setAttribute(
+        'content',
+        'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1'
+      );
+    }, 300);
+  }
+}
+
 export const ReportForm: React.FC<ReportFormProps> = ({
   emergencyType,
   userLocation,
@@ -275,6 +294,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
               placeholder="Describe the emergency situation in detail..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              onBlur={resetViewportScale}
               className="bg-white/10 border-white/30 text-white placeholder:text-white/50 min-h-[100px] md:min-h-[120px] text-sm md:text-base"
               required
             />
@@ -294,6 +314,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
               placeholder="Phone number (optional)"
               value={contactInfo}
               onChange={(e) => setContactInfo(e.target.value)}
+              onBlur={resetViewportScale}
               className="bg-white/10 border-white/30 text-white placeholder:text-white/50 text-sm md:text-base"
             />
           </div>

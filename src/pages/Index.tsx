@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import { NewsDetail } from '@/components/NewsDetail';
 import { InferenceClient } from "@huggingface/inference";
 import { useNavigate } from "react-router-dom";
+import ChatWithAI from './ChatWithAI'; // Add this import
+import { MessageCircle } from 'lucide-react'; // For chat icon
 
 export type EmergencyType = 'police' | 'fire' | 'medical' | 'disaster';
 
@@ -47,6 +49,7 @@ const Index = () => {
     location: { lat: number; lng: number; address?: string };
     contact: string;
   } | null>(null);
+  const [showChat, setShowChat] = useState(false); // Add this state
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -342,6 +345,20 @@ const Index = () => {
           </div>
         )}
       </main>
+
+      {/* Floating Chat Button - move this ABOVE Navigation */}
+      <button
+        className="fixed bottom-24 right-6 z-40 bg-liberia-blue hover:bg-liberia-red text-white rounded-full shadow-lg p-4 flex items-center justify-center transition-all"
+        onClick={() => setShowChat(true)}
+        aria-label="Chat with AI"
+      >
+        <MessageCircle className="w-6 h-6" />
+      </button>
+
+      {/* Chat Modal */}
+      {showChat && (
+        <ChatWithAI onClose={() => setShowChat(false)} />
+      )}
 
       {/* Bottom Navigation */}
       <Navigation 

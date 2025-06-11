@@ -29,7 +29,7 @@ export interface EmergencyTeam {
   distance: number;
   location: Location;
 }
-const client = new InferenceClient("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");
+const client = new InferenceClient("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");
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<'home' | 'news' | 'my-reports'>('home');

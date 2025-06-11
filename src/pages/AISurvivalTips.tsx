@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { InferenceClient } from "@huggingface/inference";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const client = new InferenceClient("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");
+const client = new InferenceClient("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");
 
 function cleanTips(text: string) {
   // Remove markdown formatting: *, **, ###, ##, #, and leading/trailing whitespace

@@ -64,6 +64,19 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
     }
   };
 
+  // Animated dots for loading
+  const [dotCount, setDotCount] = useState(1);
+  useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setDotCount((prev) => (prev % 3) + 1);
+      }, 400);
+      return () => clearInterval(interval);
+    } else {
+      setDotCount(1);
+    }
+  }, [loading]);
+
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-end">
       <div className="bg-gradient-to-br from-liberia-blue via-slate-900 to-liberia-blue rounded-t-2xl shadow-xl w-full max-w-sm p-0 m-4 flex flex-col">
@@ -71,7 +84,6 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
           <h2 className="font-bold text-lg text-white">Alert Liberia AI</h2>
           <Button size="sm" variant="ghost" onClick={onClose} className="text-white">Close</Button>
         </div>
-        {/* Set a fixed height and overflow-y-auto for scrollable chat area */}
         <div className="h-80 overflow-y-auto px-4 py-2 bg-white/5">
           {messages.map((msg, idx) => (
             <div
@@ -84,11 +96,23 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
                     ? "bg-liberia-red text-white"
                     : "bg-white/80 text-black"
                 }`}
+                style={{ whiteSpace: "pre-line" }}
               >
                 {msg.content}
               </div>
             </div>
           ))}
+          {/* AI typing animation */}
+          {loading && (
+            <div className="mb-2 flex justify-start">
+              <div className="px-3 py-2 rounded-xl max-w-[80%] text-sm bg-white/80 text-black flex items-center gap-1">
+                <span>AI is typing</span>
+                <span className="animate-pulse" style={{ width: 24, display: "inline-block" }}>
+                  {".".repeat(dotCount)}
+                </span>
+              </div>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
         <div className="flex items-center gap-2 px-4 py-3 bg-white/10 rounded-b-2xl">
@@ -105,7 +129,15 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
             disabled={loading || !input.trim()}
             className="bg-liberia-red text-white rounded-full px-4 py-2"
           >
-            {loading ? "..." : "Send"}
+            {/* Animated dots on button */}
+            {loading ? (
+              <span>
+                {"...".slice(0, dotCount)}
+                <span className="sr-only">Sending</span>
+              </span>
+            ) : (
+              "Send"
+            )}
           </Button>
         </div>
       </div>

@@ -6,9 +6,7 @@ const client = new InferenceClient("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");
 
 const cleanText = (text: string) =>
   text
-    .replace(/[*#_`>]+/g, "") // Remove *, #, _, `, > characters
-    .replace(/\n{2,}/g, "\n") // Collapse multiple newlines
-    .replace(/^\s+|\s+$/g, ""); // Trim whitespace
+    .replace(/[*#_`>]+/g, ""); // Remove *, #, _, `, > characters
 
 const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([
@@ -69,7 +67,8 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
           <h2 className="font-bold text-lg text-white">Chat with Alert Liberia AI</h2>
           <Button size="sm" variant="ghost" onClick={onClose} className="text-white">Close</Button>
         </div>
-        <div className="flex-1 h-64 overflow-y-auto px-4 py-2 bg-white/5">
+        {/* Set a fixed height and overflow-y-auto for scrollable chat area */}
+        <div className="h-80 overflow-y-auto px-4 py-2 bg-white/5">
           {messages.map((msg, idx) => (
             <div
               key={idx}

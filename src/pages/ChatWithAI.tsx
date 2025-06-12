@@ -162,11 +162,15 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
     // --- FAQ/Help Layer ---
     const faqAnswer = getFAQAnswer(input, faqAnswers);
     if (faqAnswer) {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: faqAnswer }
-      ]);
-      setLoading(false);
+      // Simulate typing delay for FAQ answers
+      const delay = 2000 + Math.random() * 1000; // 2-3 seconds
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: faqAnswer }
+        ]);
+        setLoading(false);
+      }, delay);
       return;
     }
 

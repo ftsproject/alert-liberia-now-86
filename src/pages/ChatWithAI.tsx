@@ -60,6 +60,140 @@ function resetViewportScale() {
   }
 }
 
+const FAQ_ANSWERS: { question: string | RegExp; answer: string }[] = [
+  {
+    question: /how (do|can) i report an emergency/i,
+    answer: "To report an emergency, tap the emergency type (Police, Fire, Medical, Disaster) on the home screen. Then, fill in the details, attach a photo or video if possible, and submit your report. Our team will respond as quickly as possible.",
+  },
+  {
+    question: /what is alert liberia/i,
+    answer: "Alert Liberia is a modern emergency response app designed to help you quickly connect with the nearest emergency teams, report incidents, and receive safety guidance. Your safety is our priority.",
+  },
+  {
+    question: /how (do|can) i attach (a )?(photo|video)/i,
+    answer: "When filling out the emergency report form, tap the 'Add Photo/Video' button. You can then select a photo or video from your device to help responders better understand your situation.",
+  },
+  {
+    question: /what should i do if (someone|i) (is|am) (injured|hurt)/i,
+    answer: "If someone is injured, call emergency services immediately (4455). If safe, provide first aid: stop any bleeding with clean cloth, keep the person calm and still, and do not move them unless absolutely necessary. Wait for professional help.",
+  },
+  {
+    question: /how (do|can) i enable location/i,
+    answer: "When prompted, tap 'Allow' to enable location. You can also enable location in your device settings for this app. Accurate location helps us send help to you faster.",
+  },
+  {
+    question: /how do i use the ai chat/i,
+    answer: "Type your question or describe your emergency in the chat box. The AI can provide safety tips, first aid instructions, and answer questions about using the app.",
+  },
+  {
+    question: /what number do i call for emergencies/i,
+    answer: "For emergencies in Liberia, call 4455. You can also use this app to report emergencies and get help.",
+  },
+  {
+    question: /how do i see my reports/i,
+    answer: "Tap the 'My Reports' section in the app menu to view all your submitted emergency reports and their status.",
+  },
+  {
+    question: /how do i contact the police/i,
+    answer: "You can contact the police by selecting 'Police' on the home screen and submitting a report, or by calling 4455 for immediate assistance.",
+  },
+  {
+    question: /how do i contact the fire department/i,
+    answer: "Select 'Fire' on the home screen to report a fire emergency, or call 4455. Provide your location and details for a faster response.",
+  },
+  {
+    question: /how do i contact medical help|ambulance/i,
+    answer: "For medical emergencies, select 'Medical' on the home screen or call 4455. If possible, provide details about the injury or illness.",
+  },
+  {
+    question: /how do i get disaster updates/i,
+    answer: "Check the 'News' section in the app for the latest disaster updates, safety tips, and official alerts.",
+  },
+  {
+    question: /how do i change my language/i,
+    answer: "Currently, the app is in English. Future updates may include support for more languages. Let us know if you need help in your local language.",
+  },
+  {
+    question: /is my information private|secure/i,
+    answer: "Yes, your information is kept private and secure. We only use your data to provide emergency assistance and do not share it without your consent.",
+  },
+  {
+    question: /can i use this app offline/i,
+    answer: "Some features may work offline, but reporting emergencies and getting real-time help requires an internet connection.",
+  },
+  {
+    question: /what should i do during a fire/i,
+    answer: "If there's a fire, leave the building immediately if safe. Stay low to avoid smoke, use stairs (not elevators), and call 4455 or report via the app. Do not re-enter the building until it's declared safe.",
+  },
+  {
+    question: /what should i do during a flood/i,
+    answer: "Move to higher ground immediately. Avoid walking or driving through flood waters. Stay informed via the app's news section and follow official instructions.",
+  },
+  {
+    question: /how do i update the app/i,
+    answer: "If you installed from the app store, check for updates there. If using the web version, refresh your browser to get the latest features.",
+  },
+  {
+    question: /how do i reset my password/i,
+    answer: "Currently, the app does not require a password. Your device is your key. If you have issues, contact support.",
+  },
+  {
+    question: /what should i do if i feel unsafe/i,
+    answer: "If you feel unsafe, move to a safe location if possible and contact emergency services immediately. You can also use this app to report your situation.",
+  },
+  {
+    question: /can i report anonymously/i,
+    answer: "Yes, you can submit reports without entering your name. However, providing contact information can help responders reach you faster.",
+  },
+  {
+    question: /how do i share my location/i,
+    answer: "When prompted, tap 'Allow' to share your location. This helps emergency teams find you quickly.",
+  },
+  {
+    question: /how do i cancel a report/i,
+    answer: "If you need to cancel a report, please contact emergency services directly or use the chat to explain your situation.",
+  },
+  {
+    question: /what should i do if the app is not working/i,
+    answer: "Try closing and reopening the app, or refreshing your browser. If the problem continues, contact support for help.",
+  },
+  {
+    question: /how do i get first aid tips/i,
+    answer: "Ask me about any first aid situation (e.g., 'How do I treat a burn?'), and I'll provide step-by-step instructions.",
+  },
+  {
+    question: /can i use this app for someone else/i,
+    answer: "Yes, you can report emergencies for others. Please provide as much detail as possible to help responders.",
+  },
+  {
+    question: /how do i know help is coming/i,
+    answer: "After submitting a report, you'll see it in 'My Reports'. Our team will contact you if more information is needed.",
+  },
+  {
+    question: /how do i attach my location to a report/i,
+    answer: "When submitting a report, your location is automatically included if you have enabled location services.",
+  },
+  {
+    question: /how do i get safety tips/i,
+    answer: "You can ask me for safety tips about any emergency, or check the 'News' section for official advice.",
+  },
+  // Add more as needed!
+];
+
+// Helper to check for FAQ match
+function getFAQAnswer(input: string): string | null {
+  for (const { question, answer } of FAQ_ANSWERS) {
+    if (
+      typeof question === "string"
+        ? input.toLowerCase().includes(question.toLowerCase())
+        : question.test(input)
+    ) {
+      return answer;
+    }
+  }
+  return null;
+}
+
 const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([
     { role: "assistant", content: "Hi! Any Emergency I can Help with?" }
@@ -120,6 +254,18 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
     setInput("");
     setLoading(true);
 
+    // --- FAQ/Help Layer ---
+    const faqAnswer = getFAQAnswer(input);
+    if (faqAnswer) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: faqAnswer }
+      ]);
+      setLoading(false);
+      return;
+    }
+
+    // --- Fallback to AI ---
     try {
       const chatCompletion = await client.chatCompletion({
         provider: "auto",

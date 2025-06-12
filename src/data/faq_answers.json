@@ -499,5 +499,879 @@
       "Hello! How can I support you with Alert Liberia?"
     ],
     "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i submit a report",
+      "how to submit a report",
+      "submit a report",
+      "how can i send a report",
+      "how do i file a report",
+      "how do i make a report",
+      "how do i report an incident",
+      "how do i send a report"
+    ],
+    "answers": [
+      "To submit a report, open the app and select the type of emergency (Police, Fire, Medical, Disaster). Fill in the details, attach a photo or video if possible, and tap the submit button. Your report will be sent to the emergency team.",
+      "Choose the emergency type, provide as much detail as you can, and press submit. Our team will receive your report and respond as soon as possible.",
+      "Open the app, select the emergency type, fill out the form, and tap submit to send your report."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i use this app",
+      "how does alert liberia work",
+      "what can i do with alert liberia",
+      "what features does alert liberia have"
+    ],
+    "answers": [
+      "Alert Liberia lets you report emergencies, get help, receive safety tips, and stay updated with news. You can chat with AI, submit reports, and contact emergency teams directly from the app."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i chat with ai",
+      "can i ask ai for help",
+      "what can i ask the ai",
+      "how does the ai chat work"
+    ],
+    "answers": [
+      "You can ask the AI about emergencies, first aid, how to use the app, or any safety question. Just type your message in the chat box and the AI will respond."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i attach a photo",
+      "how do i attach a video",
+      "can i upload media",
+      "can i send a picture or video"
+    ],
+    "answers": [
+      "When submitting a report, use the 'Attach Media' option to add a photo or video. Only one file can be attached per report."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i enable location",
+      "why does the app need my location",
+      "how do i share my location",
+      "location not working"
+    ],
+    "answers": [
+      "Enable location services on your device and allow the app to access your location. This helps emergency teams find you faster."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i contact emergency teams",
+      "how do i call for help",
+      "how do i video call a team",
+      "can i call the police",
+      "can i call the fire department",
+      "can i call medical help"
+    ],
+    "answers": [
+      "You can contact emergency teams by selecting the type of emergency and using the call or video call option. For urgent help, call 4455."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i check my reports",
+      "where can i see my submitted reports",
+      "how do i track my emergency reports",
+      "can i see the status of my report"
+    ],
+    "answers": [
+      "Go to 'My Reports' in the app to view all your submitted emergency reports and their status."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i get news updates",
+      "where can i read emergency news",
+      "how do i see latest alerts",
+      "how do i get safety tips"
+    ],
+    "answers": [
+      "Check the News section in the app for the latest updates, alerts, and safety tips."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i update my contact information",
+      "can i change my phone number",
+      "how do i add my phone number"
+    ],
+    "answers": [
+      "You can enter your contact information when submitting a report. If you need to update it, enter the new number in the report form."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i use voice input",
+      "can i speak my report",
+      "how do i use speech to text"
+    ],
+    "answers": [
+      "Tap the microphone icon in the report form or chat to use voice input. Speak clearly and your speech will be transcribed."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i cancel a report",
+      "can i delete a report",
+      "i made a mistake in my report"
+    ],
+    "answers": [
+      "If you need to cancel or correct a report, contact support or explain your situation in the chat."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i get help if i have no internet",
+      "can i use the app offline",
+      "does the app work without internet"
+    ],
+    "answers": [
+      "Some features may work offline, but reporting emergencies and getting real-time help requires an internet connection. In urgent cases, call 4455."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i know if my report was received",
+      "will i get confirmation after submitting a report",
+      "how do i know help is coming"
+    ],
+    "answers": [
+      "After submitting a report, you'll see it in 'My Reports'. Our team will contact you if more information is needed and you will receive updates in the app."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i get ai survival tips",
+      "can ai give me safety advice",
+      "how do i get tips while waiting for help"
+    ],
+    "answers": [
+      "After submitting a report, you can view AI-generated survival tips in the app to help you stay safe while waiting for emergency responders."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report for someone else",
+      "can i submit a report for another person",
+      "can i help someone else with this app"
+    ],
+    "answers": [
+      "Yes, you can submit a report for someone else. Provide as much detail as possible to help responders."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i get back to home screen",
+      "how do i navigate the app",
+      "how do i go back"
+    ],
+    "answers": [
+      "Use the navigation bar at the bottom of the app to switch between Emergency, News, and My Reports. Use the back button to return to the previous screen."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i prepare for a flood",
+      "flood preparation tips",
+      "what should i do before a flood",
+      "how can i get ready for flooding"
+    ],
+    "answers": [
+      "Stay informed about weather updates. Prepare an emergency kit, keep important documents safe, and know your evacuation routes.",
+      "Move valuables to higher ground and listen to local authorities for instructions."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i prepare for a fire",
+      "fire preparation tips",
+      "what should i do before a fire",
+      "how can i get ready for a fire"
+    ],
+    "answers": [
+      "Install smoke detectors, keep fire extinguishers handy, and plan escape routes. Practice fire drills with your family.",
+      "Keep flammable materials away from heat sources and know emergency numbers."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i prepare for a medical emergency",
+      "medical emergency preparation",
+      "what should i do before a medical emergency",
+      "how can i get ready for medical emergencies"
+    ],
+    "answers": [
+      "Keep a first aid kit at home and know basic first aid. Save emergency numbers in your phone.",
+      "Learn CPR and keep important medical information accessible."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i prepare for a disaster",
+      "disaster preparation tips",
+      "what should i do before a disaster",
+      "how can i get ready for disasters"
+    ],
+    "answers": [
+      "Have an emergency plan, pack a go-bag with essentials, and stay informed through the app's news section.",
+      "Know your local shelters and keep emergency contacts updated."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "what should i do if i lose my phone",
+      "lost phone emergency",
+      "how do i report if my phone is lost"
+    ],
+    "answers": [
+      "If you lose your phone, try to contact your service provider to block it. Use another device to report emergencies or contact 4455.",
+      "Let your contacts know and use the app on another device if possible."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a missing person",
+      "missing person report",
+      "how can i report someone missing"
+    ],
+    "answers": [
+      "Select 'Police' in the app and provide details about the missing person, including last seen location and description. You can also call 4455.",
+      "Give as much information as possible to help authorities locate the person."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a stolen vehicle",
+      "stolen car report",
+      "how can i report my car stolen"
+    ],
+    "answers": [
+      "Use the app to select 'Police' and provide details about your vehicle, including make, model, color, and license plate. You can also call 4455.",
+      "Report the theft as soon as possible for a faster response."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a fire outbreak",
+      "fire outbreak report",
+      "how can i report a fire"
+    ],
+    "answers": [
+      "Select 'Fire' in the app and provide details about the location and size of the fire. Attach a photo if possible.",
+      "Call 4455 for urgent fire emergencies."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a medical emergency for someone else",
+      "report medical emergency for another person",
+      "how can i help someone with a medical emergency"
+    ],
+    "answers": [
+      "Select 'Medical' in the app, provide details about the person's condition, and include your contact information if possible.",
+      "Call 4455 if the situation is urgent."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a road accident",
+      "road accident report",
+      "how can i report a car accident"
+    ],
+    "answers": [
+      "Select the appropriate emergency type in the app, provide details about the accident, and attach a photo if possible.",
+      "Call 4455 if there are injuries or immediate danger."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a power outage",
+      "power outage report",
+      "how can i report no electricity"
+    ],
+    "answers": [
+      "Use the app to report a disaster or utility emergency, or contact your local power company directly.",
+      "Provide your location and details about the outage."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report water shortage",
+      "water shortage report",
+      "how can i report no water"
+    ],
+    "answers": [
+      "Use the app to report a disaster or utility emergency, or contact your local water company.",
+      "Provide your location and details about the shortage."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a collapsed building",
+      "collapsed building report",
+      "how can i report a building collapse"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, provide details about the location and number of people involved, and attach a photo if possible.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a landslide",
+      "landslide report",
+      "how can i report a landslide"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, provide details about the location and impact, and attach a photo if possible.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a flood",
+      "flood report",
+      "how can i report flooding"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, provide details about the location and severity, and attach a photo if possible.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a robbery",
+      "robbery report",
+      "how can i report a robbery"
+    ],
+    "answers": [
+      "Select 'Police' in the app, provide details about the incident, and attach a photo or video if possible.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report domestic violence",
+      "domestic violence report",
+      "how can i report abuse"
+    ],
+    "answers": [
+      "Select 'Police' or 'Medical' in the app, provide details about the situation, and include your contact information if possible.",
+      "All reports are confidential and will be handled with care."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report child abuse",
+      "child abuse report",
+      "how can i report abuse of a child"
+    ],
+    "answers": [
+      "Select 'Police' or 'Medical' in the app, provide details about the situation, and include your contact information if possible.",
+      "All reports are confidential and will be handled with care."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report gender-based violence",
+      "gender-based violence report",
+      "how can i report gbv"
+    ],
+    "answers": [
+      "Select 'Police' or 'Medical' in the app, provide details about the situation, and include your contact information if possible.",
+      "All reports are confidential and will be handled with care."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a missing child",
+      "missing child report",
+      "how can i report a child missing"
+    ],
+    "answers": [
+      "Select 'Police' in the app, provide details about the child, last seen location, and attach a photo if possible.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a suspicious activity",
+      "suspicious activity report",
+      "how can i report something suspicious"
+    ],
+    "answers": [
+      "Select 'Police' in the app, provide details about the activity, location, and attach a photo or video if possible.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a public health emergency",
+      "public health emergency report",
+      "how can i report a health emergency"
+    ],
+    "answers": [
+      "Select 'Medical' or 'Disaster' in the app, provide details about the situation, and include your contact information if possible.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a road blockage",
+      "road blockage report",
+      "how can i report blocked roads"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, provide details about the location and cause of the blockage, and attach a photo if possible.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a protest",
+      "protest report",
+      "how can i report a protest"
+    ],
+    "answers": [
+      "Select 'Police' or 'Disaster' in the app, provide details about the protest, location, and attach a photo or video if possible.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a fire hazard",
+      "fire hazard report",
+      "how can i report fire risks"
+    ],
+    "answers": [
+      "Select 'Fire' in the app, provide details about the hazard, location, and attach a photo if possible.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a gas leak",
+      "gas leak report",
+      "how can i report a gas leak"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, provide details about the leak, location, and evacuate the area if necessary.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report an animal attack",
+      "animal attack report",
+      "how can i report animal bites"
+    ],
+    "answers": [
+      "Select 'Medical' in the app, provide details about the attack, location, and seek medical attention immediately.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a snake bite",
+      "snake bite report",
+      "how can i report a snake bite"
+    ],
+    "answers": [
+      "Select 'Medical' in the app, provide details about the bite, location, and seek medical attention immediately.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a drowning",
+      "drowning report",
+      "how can i report someone drowning"
+    ],
+    "answers": [
+      "Select 'Medical' in the app, provide details about the incident, location, and seek help immediately.",
+      "Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a fire in my neighborhood",
+      "fire in my area",
+      "there is a fire near my house"
+    ],
+    "answers": [
+      "Select 'Fire' in the app, enter your neighborhood or address, describe the fire, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a medical emergency at school",
+      "student medical emergency",
+      "someone is hurt at school"
+    ],
+    "answers": [
+      "Select 'Medical' in the app, provide the school's name and location, describe the emergency, and include your contact info. Call 4455 if urgent."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a robbery at the market",
+      "robbery at the market",
+      "someone stole at the market"
+    ],
+    "answers": [
+      "Select 'Police' in the app, enter the market's name and location, describe the incident, and attach a photo or video if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a flood in my community",
+      "flood in my area",
+      "my community is flooded"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, provide your community name and details about the flood, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a power outage in my neighborhood",
+      "no electricity in my area",
+      "power cut in my community"
+    ],
+    "answers": [
+      "Use the app to report a utility emergency, provide your neighborhood name, and describe the outage. You can also contact your local power company."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a road accident on the highway",
+      "accident on the highway",
+      "car crash on the main road"
+    ],
+    "answers": [
+      "Select the appropriate emergency type in the app, provide the highway name or location, describe the accident, and attach a photo if possible. Call 4455 if there are injuries."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a missing person in Monrovia",
+      "missing person in Monrovia",
+      "someone is missing in Monrovia"
+    ],
+    "answers": [
+      "Select 'Police' in the app, provide details about the missing person, last seen location in Monrovia, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a collapsed building in Paynesville",
+      "building collapse in Paynesville",
+      "there is a collapsed building in Paynesville"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, enter Paynesville as the location, describe the collapse, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a fire at the market",
+      "market fire emergency",
+      "fire outbreak at the market"
+    ],
+    "answers": [
+      "Select 'Fire' in the app, provide the market's name and location, describe the fire, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a landslide in my village",
+      "landslide in my village",
+      "my village is affected by a landslide"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, provide your village name and details about the landslide, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a snake bite in the bush",
+      "snake bite in the bush",
+      "someone was bitten by a snake in the bush"
+    ],
+    "answers": [
+      "Select 'Medical' in the app, provide the bush location, describe the situation, and seek medical attention immediately. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a protest in the city center",
+      "protest in the city",
+      "there is a protest downtown"
+    ],
+    "answers": [
+      "Select 'Police' or 'Disaster' in the app, provide the city center location, describe the protest, and attach a photo or video if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a gas leak at home",
+      "gas leak in my house",
+      "smell of gas at home"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, provide your home address, describe the leak, and evacuate the area if necessary. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a drowning at the river",
+      "drowning at the river",
+      "someone drowned in the river"
+    ],
+    "answers": [
+      "Select 'Medical' in the app, provide the river's name and location, describe the incident, and seek help immediately. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a robbery at night",
+      "robbery at night",
+      "i was robbed at night"
+    ],
+    "answers": [
+      "Select 'Police' in the app, provide the time and location of the robbery, describe the incident, and attach a photo or video if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a fire in an apartment building",
+      "apartment fire emergency",
+      "fire in my apartment building"
+    ],
+    "answers": [
+      "Select 'Fire' in the app, provide the apartment building's address, describe the fire, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a medical emergency in a remote area",
+      "medical emergency in the village",
+      "someone is sick in a remote area"
+    ],
+    "answers": [
+      "Select 'Medical' in the app, provide the remote area's name and details about the emergency, and include your contact info. Call 4455 if urgent."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a flood during the rainy season",
+      "rainy season flood",
+      "flooding during heavy rain"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, provide your location and details about the flood, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a missing child at the beach",
+      "child missing at the beach",
+      "lost child at the beach"
+    ],
+    "answers": [
+      "Select 'Police' in the app, provide the beach name and details about the child, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a suspicious package at the bus station",
+      "suspicious package at the station",
+      "there is a suspicious item at the bus station"
+    ],
+    "answers": [
+      "Select 'Police' in the app, provide the bus station's name and location, describe the package, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a fire in the school dormitory",
+      "fire in school dorm",
+      "school dormitory fire emergency"
+    ],
+    "answers": [
+      "Select 'Fire' in the app, provide the school's name and dormitory details, describe the fire, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a medical emergency at the football field",
+      "injury at the football field",
+      "someone collapsed during a match"
+    ],
+    "answers": [
+      "Select 'Medical' in the app, provide the football field's location, describe the emergency, and include your contact info. Call 4455 if urgent."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a robbery in the parking lot",
+      "robbery in parking area",
+      "someone was robbed in the parking lot"
+    ],
+    "answers": [
+      "Select 'Police' in the app, provide the parking lot location, describe the incident, and attach a photo or video if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a flood at the hospital",
+      "hospital flood emergency",
+      "flooding at the hospital"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, provide the hospital's name and location, describe the flood, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a power outage at the airport",
+      "no electricity at the airport",
+      "airport power cut"
+    ],
+    "answers": [
+      "Use the app to report a utility emergency, provide the airport's name and location, and describe the outage. You can also contact airport authorities."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a road accident near the bridge",
+      "accident near the bridge",
+      "car crash at the bridge"
+    ],
+    "answers": [
+      "Select the appropriate emergency type in the app, provide the bridge name or location, describe the accident, and attach a photo if possible. Call 4455 if there are injuries."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a missing person at the stadium",
+      "missing person at the stadium",
+      "someone is missing at the stadium"
+    ],
+    "answers": [
+      "Select 'Police' in the app, provide details about the missing person, last seen location at the stadium, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a collapsed building in the city center",
+      "building collapse downtown",
+      "there is a collapsed building in the city"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, enter the city center as the location, describe the collapse, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a fire at the church",
+      "church fire emergency",
+      "fire outbreak at the church"
+    ],
+    "answers": [
+      "Select 'Fire' in the app, provide the church's name and location, describe the fire, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report a landslide on the hillside",
+      "landslide on the hill",
+      "hillside landslide emergency"
+    ],
+    "answers": [
+      "Select 'Disaster' in the app, provide the hillside location and details about the landslide, and attach a photo if possible. Call 4455 for urgent help."
+    ],
+    "isRegex": true
   }
 ]

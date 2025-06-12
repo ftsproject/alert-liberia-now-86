@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { InferenceClient } from "@huggingface/inference";
-import { Volume2 } from "lucide-react";
+import { Volume2, Mic } from "lucide-react";
 
 const client = new InferenceClient("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");
 
@@ -311,9 +311,7 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
             className={`rounded-full p-2 ${isListening ? "bg-liberia-blue text-white" : "bg-white text-liberia-blue"} border border-liberia-blue`}
             style={{ outline: isListening ? "2px solid #2563eb" : "none" }}
           >
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-              <path d="M12 15a3 3 0 0 0 3-3V7a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a1 1 0 1 0-2 0 5 5 0 1 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12Z" fill="currentColor"/>
-            </svg>
+            <Mic className="w-5 h-5" />
           </button>
           <Button
             onClick={sendMessage}

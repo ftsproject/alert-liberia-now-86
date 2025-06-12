@@ -55,6 +55,8 @@ const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const LOCATION_PERMISSION_KEY = "locationPermission";
+
   // Show prompt on mount if not already granted/denied
   useEffect(() => {
     if (locationPermission === 'pending') {
@@ -62,9 +64,24 @@ const Index = () => {
     }
   }, [locationPermission]);
 
+  // Check saved location permission on mount
+  useEffect(() => {
+    const savedPermission = localStorage.getItem(LOCATION_PERMISSION_KEY);
+    if (savedPermission === "granted") {
+      setLocationPermission("granted");
+      // Optionally, auto-request location here if you want
+      requestLocation();
+    } else if (savedPermission === "denied") {
+      setLocationPermission("denied");
+    } else {
+      setLocationPermission("pending");
+    }
+  }, []);
+
   // Custom handler for user action
   const handleAllowLocation = () => {
     setShowLocationPrompt(false);
+    localStorage.setItem(LOCATION_PERMISSION_KEY, "granted"); // Save choice
     // Now request location
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -121,6 +138,7 @@ const Index = () => {
     setShowLocationPrompt(false);
     setLocationPermission('denied');
     setLocationString("");
+    localStorage.setItem(LOCATION_PERMISSION_KEY, "denied"); // Save choice
     toast({
       title: "Location access denied",
       description: "Please enable location services for better emergency response.",
@@ -435,7 +453,7 @@ const Index = () => {
         />
 
         {/* Custom Location Prompt Modal */}
-        {showLocationPrompt && (
+        {showLocationPrompt && locationPermission === 'pending' && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
             <div className="bg-white rounded-xl shadow-xl p-6 max-w-xs w-full text-center">
               <h2 className="text-lg font-bold mb-2 text-liberia-blue">Allow Location Access?</h2>

@@ -40,7 +40,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onViewChang
   const osClass = getOSClass();
 
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-md border-t border-white/20 h-16 sm:h-18 md:h-20 lg:h-20 ${osClass}`}>
+    <nav className={`fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-md border-t border-white/20 h-20 sm:h-120 md:h-20 lg:h-20 ${osClass}`}>
       <div className="container mx-auto px-2 h-full">
         <div className="flex justify-around items-center h-full py-0">
           {navItems.map((item) => {

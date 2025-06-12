@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import AISurvivalTips from "./pages/AISurvivalTips";
 import { useToast } from "@/hooks/use-toast";
 import { io } from "socket.io-client";
+import { SocketProvider } from '@/hooks/use-socket';
 
 const queryClient = new QueryClient();
 

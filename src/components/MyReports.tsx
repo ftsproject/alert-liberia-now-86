@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmergencyType } from '@/pages/Index';
+import { useSocket } from '@/hooks/use-socket.tsx';
 
 interface Report {
   _id: string | { $oid: string };
@@ -31,23 +32,25 @@ interface MyReportsProps {
 const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const socket = useSocket(); // <-- Get socket instance
 
   useEffect(() => {
+    const deviceId = localStorage.getItem("deviceId");
+    if (!deviceId) {
+      setReports([]);
+      setLoading(false);
+      return;
+    }
+
+    // Initial fetch (optional, or you can request all via socket)
     const fetchDeviceReports = async () => {
       setLoading(true);
-      const deviceId = localStorage.getItem("deviceId");
-      if (!deviceId) {
-        setReports([]);
-        setLoading(false);
-        return;
-      }
       try {
         const res = await fetch(
           `https://ltc-backend-tqh5.onrender.com/api/reports/device/${deviceId}`
         );
         if (!res.ok) throw new Error("Failed to fetch reports");
         const data = await res.json();
-        // Sort by timestamp descending (latest first)
         const sorted = data.sort(
           (a: Report, b: Report) =>
             new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
@@ -60,7 +63,20 @@ const MyReports: React.FC<MyReportsProps> = ({ onBack }) => {
     };
 
     fetchDeviceReports();
-  }, []);
+
+    // --- Listen for new_report events ---
+    const handleNewReport = (report: Report) => {
+      if (report.deviceId === deviceId) {
+        setReports(prev => [report, ...prev]);
+        setLoading(false); // <-- stop loading after receiving new report
+      }
+    };
+    socket.on('new_report', handleNewReport);
+
+    return () => {
+      socket.off('new_report', handleNewReport);
+    };
+  }, [socket]);
 
   const getEmergencyTypeColor = (type: EmergencyType) => {
     switch (type) {

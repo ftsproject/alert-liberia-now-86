@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { EmergencyType, Location } from '@/pages/Index';
 import { useToast } from '@/hooks/use-toast';
+import { useSocket } from '@/hooks/use-socket.tsx';
 
 interface ReportFormProps {
   emergencyType: EmergencyType;
@@ -50,6 +51,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [listening, setListening] = useState(false);
   const { toast } = useToast();
+  const socket = useSocket(); // <-- Get socket instance
 
   // Convert file to base64 string
   const fileToBase64 = (file: File): Promise<string> => {
@@ -118,38 +120,33 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       permanentToken,
     };
 
-    try {
-      const res = await fetch("https://ltc-backend-tqh5.onrender.com/api/reports", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error("Failed to submit report");
-      toast({
-        title: "Report submitted",
-        description: "Your emergency report has been sent to the response team.",
-        className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
-      });
-      setSubmitting(false);
-      // Pass info for AI solution page
-      onSubmit({
-        description,
-        location: {
-          lat: userLocation.lat,
-          lng: userLocation.lng,
-          address: userLocation.address || "",
-        },
-        contact: contactInfo,
-      });
-    } catch {
-      setSubmitting(false);
-      toast({
-        title: "Submission failed",
-        description: "Could not submit your report. Please try again.",
-        variant: "destructive",
-        className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
-      });
-    }
+    // Use socket.emit and handle response
+    socket.emit('submitReport', payload, (response: { success: boolean; error?: string }) => {
+      setSubmitting(false); // <-- stop spinner
+      if (response.success) {
+        toast({
+          title: "Report submitted",
+          description: "Your emergency report has been sent to the response team.",
+          className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
+        });
+        onSubmit({
+          description,
+          location: {
+            lat: userLocation.lat,
+            lng: userLocation.lng,
+            address: userLocation.address || "",
+          },
+          contact: contactInfo,
+        });
+      } else {
+        toast({
+          title: "Submission failed",
+          description: response.error || "Could not submit your report. Please try again.",
+          variant: "destructive",
+          className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
+        });
+      }
+    });
   };
 
   // Only allow one media file (image or video, or none)

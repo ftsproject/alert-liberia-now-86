@@ -403,5 +403,101 @@
       "The helpline is open all day, every day."
     ],
     "isRegex": true
+  },
+  {
+    "questions": [
+      "what should i do during an armed robbery",
+      "armed robbery advice",
+      "robbery emergency",
+      "someone is robbing",
+      "i am being robbed"
+    ],
+    "answers": [
+      "If you are experiencing an armed robbery, do not resist. Try to stay calm, avoid sudden movements, and do not look directly at the robbers. When safe, use the app or call 4455 to report the incident.",
+      "Your safety is most important. Do not fight back during a robbery. Report the incident as soon as you are safe."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i report gender-based violence",
+      "report domestic violence",
+      "report abuse",
+      "violence against women",
+      "violence against children"
+    ],
+    "answers": [
+      "To report gender-based or domestic violence, use the app and select the appropriate emergency type, or call 4455. All reports are confidential and will be handled with care.",
+      "You can report abuse or violence through the app or by calling 4455. Your information will be kept private."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i get updates about disease outbreaks",
+      "health alerts",
+      "disease outbreak news",
+      "epidemic updates",
+      "covid updates"
+    ],
+    "answers": [
+      "Check the News section in the app for updates on disease outbreaks and health alerts in Liberia.",
+      "We provide health and epidemic updates in the News section. Stay informed for your safety."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "can i use the app if i have no credit",
+      "does the app work without airtime",
+      "can i report emergency without credit",
+      "no credit emergency report"
+    ],
+    "answers": [
+      "Yes, you can use the app to report emergencies even if you have no credit or airtime, as long as you have an internet connection.",
+      "No airtime is needed to use the app for reporting emergencies. Just ensure you are connected to the internet."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i help during a road accident",
+      "road accident advice",
+      "what to do if i see a car crash",
+      "accident emergency",
+      "i witnessed a road accident"
+    ],
+    "answers": [
+      "If you witness a road accident, ensure your own safety first. Call 4455 or use the app to report the accident, provide details and location. If safe, offer basic first aid and wait for emergency services.",
+      "Report the accident using the app or by calling 4455. Do not move injured persons unless there is immediate danger."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "hi",
+      "hello",
+      "hey",
+      "good morning",
+      "good afternoon",
+      "good evening",
+      "how are you",
+      "how are you doing",
+      "greetings",
+      "what's up",
+      "howdy",
+      "yo",
+      "sup",
+      "hi there",
+      "hello there"
+    ],
+    "answers": [
+      "Hello! How can I assist you today?",
+      "Hi there! Do you need help or have a question about emergencies?",
+      "Hey! I'm here to help with any emergency or safety questions.",
+      "Greetings! Let me know if you need assistance.",
+      "Hello! How can I support you with Alert Liberia?"
+    ],
+    "isRegex": true
   }
 ]

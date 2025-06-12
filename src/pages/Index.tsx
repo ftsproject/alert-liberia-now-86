@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EmergencyTypeSelector } from '@/components/EmergencyTypeSelector';
 import { NearestTeams } from '@/components/NearestTeams';
 import { ReportForm } from '@/components/ReportForm';
@@ -51,12 +51,83 @@ const Index = () => {
     contact: string;
   } | null>(null);
   const [showChat, setShowChat] = useState(false); // Add this state
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Show prompt on mount if not already granted/denied
   useEffect(() => {
-    requestLocation();
-  }, []);
+    if (locationPermission === 'pending') {
+      setShowLocationPrompt(true);
+    }
+  }, [locationPermission]);
+
+  // Custom handler for user action
+  const handleAllowLocation = () => {
+    setShowLocationPrompt(false);
+    // Now request location
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          console.log("Latitude:", lat, "Longitude:", lng); // Log lat and long
+          let address = "";
+          let name = "";
+          let neighbourhood = "";
+          try {
+            // Use OpenStreetMap Nominatim for free reverse geocoding
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            );
+            const data = await res.json();
+            address = data.display_name || "";
+            name = data.name || "";
+            neighbourhood = data.address?.neighbourhood || "";
+          } catch {
+            address = "";
+            name = "";
+            neighbourhood = "";
+          }
+          setUserLocation({
+            lat,
+            lng,
+            address,
+          });
+          // Use name, then neighbourhood, then display_name
+          let locationLabel = name
+            ? name
+            : neighbourhood
+            ? neighbourhood
+            : address;
+          setLocationString(locationLabel);
+          setLocationPermission('granted');
+        },
+        (error) => {
+          setLocationPermission('denied');
+          setLocationString("");
+          toast({
+            title: "Location access denied",
+            description: "Please enable location services for better emergency response.",
+            variant: "destructive",
+            className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
+          });
+        }
+      );
+    }
+  };
+
+  const handleDenyLocation = () => {
+    setShowLocationPrompt(false);
+    setLocationPermission('denied');
+    setLocationString("");
+    toast({
+      title: "Location access denied",
+      description: "Please enable location services for better emergency response.",
+      variant: "destructive",
+      className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
+    });
+  };
 
   // Send/Update user location every 5 seconds
   useEffect(() => {
@@ -126,60 +197,6 @@ const Index = () => {
     fetchSummary();
     return () => { abort = true; };
   }, [selectedNews]);
-
-  // Update requestLocation to set location string using reverse geocoding
-  const requestLocation = () => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          console.log("Latitude:", lat, "Longitude:", lng); // Log lat and long
-          let address = "";
-          let name = "";
-          let neighbourhood = "";
-          try {
-            // Use OpenStreetMap Nominatim for free reverse geocoding
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-            );
-            const data = await res.json();
-            address = data.display_name || "";
-            name = data.name || "";
-            neighbourhood = data.address?.neighbourhood || "";
-          } catch {
-            address = "";
-            name = "";
-            neighbourhood = "";
-          }
-          setUserLocation({
-            lat,
-            lng,
-            address,
-          });
-          // Use name, then neighbourhood, then display_name
-          let locationLabel = name
-            ? name
-            : neighbourhood
-            ? neighbourhood
-            : address;
-          setLocationString(locationLabel);
-          setLocationPermission('granted');
-        },
-        (error) => {
-          console.error('Location error:', error);
-          setLocationPermission('denied');
-          setLocationString("");
-          toast({
-            title: "Location access denied",
-            description: "Please enable location services for better emergency response.",
-            variant: "destructive",
-            className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
-          });
-        }
-      );
-    }
-  };
 
   const handleEmergencyTypeSelect = (type: EmergencyType) => {
     setSelectedEmergencyType(type);
@@ -251,6 +268,55 @@ const Index = () => {
     return text
       .replace(/[*#]+/g, "") // Remove all * and # characters
       .replace(/^\s+|\s+$/g, ""); // Trim whitespace
+  }
+
+  function requestLocation() {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          let address = "";
+          let name = "";
+          let neighbourhood = "";
+          try {
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            );
+            const data = await res.json();
+            address = data.display_name || "";
+            name = data.name || "";
+            neighbourhood = data.address?.neighbourhood || "";
+          } catch {
+            address = "";
+            name = "";
+            neighbourhood = "";
+          }
+          setUserLocation({
+            lat,
+            lng,
+            address,
+          });
+          let locationLabel = name
+            ? name
+            : neighbourhood
+            ? neighbourhood
+            : address;
+          setLocationString(locationLabel);
+          setLocationPermission('granted');
+        },
+        (error) => {
+          setLocationPermission('denied');
+          setLocationString("");
+          toast({
+            title: "Location access denied",
+            description: "Please enable location services for better emergency response.",
+            variant: "destructive",
+            className: "sm:max-w-xs md:max-w-sm rounded-xl shadow-lg"
+          });
+        }
+      );
+    }
   }
 
   return (
@@ -367,6 +433,32 @@ const Index = () => {
           currentView={currentView}
           onViewChange={setCurrentView}
         />
+
+        {/* Custom Location Prompt Modal */}
+        {showLocationPrompt && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+            <div className="bg-white rounded-xl shadow-xl p-6 max-w-xs w-full text-center">
+              <h2 className="text-lg font-bold mb-2 text-liberia-blue">Allow Location Access?</h2>
+              <p className="text-gray-700 mb-4">
+                To find nearby emergency teams and provide accurate help, we need your location.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  className="bg-liberia-blue text-white px-4 py-2 rounded-lg font-semibold hover:bg-liberia-blue/90"
+                  onClick={handleAllowLocation}
+                >
+                  Allow
+                </button>
+                <button
+                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300"
+                  onClick={handleDenyLocation}
+                >
+                  Deny
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </SocketProvider>
   );

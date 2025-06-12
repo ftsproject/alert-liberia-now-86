@@ -96,6 +96,7 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Load voices on mount
   useEffect(() => {
@@ -196,8 +197,9 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
     setLoading(false);
   };
 
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !loading) {
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey && !loading) {
+      e.preventDefault(); // Prevent newline
       sendMessage();
     }
   };
@@ -239,6 +241,14 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
     recognitionRef.current?.stop();
     setIsListening(false);
   };
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+    }
+  }, [input]);
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-end">
@@ -295,14 +305,16 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
           <div ref={messagesEndRef} />
         </div>
         <div className="flex items-center gap-2 px-4 py-3 bg-white/10 rounded-b-2xl">
-          <input
-            className="flex-1 border border-white/20 bg-white/80 rounded-full px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-liberia-blue"
+          <textarea
+            ref={textareaRef}
+            className="flex-1 border border-white/30 bg-white/90 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-liberia-blue resize-none max-h-40 min-h-[40px] transition-all shadow-inner overflow-y-auto hide-scrollbar"
             placeholder="Type your message..."
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleInputKeyDown}
             disabled={loading}
             onBlur={resetViewportScale}
+            rows={1}
           />
           <button
             type="button"
@@ -319,9 +331,10 @@ const ChatWithAI = ({ onClose }: { onClose: () => void }) => {
             className="bg-liberia-red text-white rounded-full px-4 py-2"
           >
             {loading ? (
-              <span>
-                {"...".slice(0, dotCount)}
-                <span className="sr-only">Sending</span>
+              <span className="flex gap-1 ml-2">
+                <span className="w-1 h-1 bg-liberia-blue rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                <span className="w-1 h-1 bg-liberia-blue rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                <span className="w-1 h-1 bg-liberia-blue rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
               </span>
             ) : (
               "Send"

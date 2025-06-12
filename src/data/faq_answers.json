@@ -1,0 +1,407 @@
+[
+  {
+    "questions": [
+      "how (do|can) i report an emergency",
+      "how to report an emergency",
+      "emergency report",
+      "reporting an emergency",
+      "i need to report an emergency",
+      "how do i send an emergency alert",
+      "how can i alert authorities",
+      "how do i notify about an emergency",
+      "how do i make an emergency report",
+      "how do i contact emergency services",
+      "how do i get help in an emergency",
+      "how do i file an emergency report",
+      "how do i submit an emergency",
+      "how do i send an alert",
+      "how do i use the app to report an emergency"
+    ],
+    "answers": [
+      "To report an emergency, tap the emergency type (Police, Fire, Medical, Disaster) on the home screen. Then, fill in the details, attach a photo or video if possible, and submit your report. Our team will respond as quickly as possible.",
+      "Tap the emergency type on the home screen, fill in the details, and submit your report. We'll respond as soon as possible.",
+      "Select the type of emergency and follow the instructions to submit your report.",
+      "Open the app, choose the emergency type, and provide as much detail as you can.",
+      "Just open the app, pick the emergency type, and send your report.",
+      "Choose the emergency type, fill out the form, and tap submit.",
+      "You can report an emergency by selecting the type and providing details in the app."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "what is alert liberia",
+      "tell me about alert liberia",
+      "explain alert liberia",
+      "what does alert liberia do",
+      "what is this app for"
+    ],
+    "answers": [
+      "Alert Liberia is a modern emergency response app designed to help you quickly connect with the nearest emergency teams, report incidents, and receive safety guidance. Your safety is our priority.",
+      "Alert Liberia helps you report emergencies and get help fast.",
+      "This app connects you to emergency services and provides safety information.",
+      "Alert Liberia is your tool for fast emergency reporting and updates."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how (do|can) i attach (a )?(photo|video)",
+      "how do i add a photo",
+      "how do i add a video",
+      "can i send a picture",
+      "can i upload a video"
+    ],
+    "answers": [
+      "When filling out the emergency report form, tap the 'Add Photo/Video' button. You can then select a photo or video from your device to help responders better understand your situation.",
+      "Use the 'Add Photo/Video' option in the report form to upload images or videos.",
+      "Yes, you can attach photos or videos to your emergency report for more details."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "what should i do if (someone|i) (is|am) (injured|hurt)",
+      "someone is hurt",
+      "i am injured",
+      "what to do if injured",
+      "what to do if someone is hurt"
+    ],
+    "answers": [
+      "If someone is injured, call emergency services immediately (4455). If safe, provide first aid: stop any bleeding with clean cloth, keep the person calm and still, and do not move them unless absolutely necessary. Wait for professional help.",
+      "Call 4455 for help. If safe, give first aid and keep the person calm.",
+      "Do not move the injured person unless necessary. Call for help and provide basic first aid if you can."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how (do|can) i enable location",
+      "how do i turn on location",
+      "enable location services",
+      "location not working"
+    ],
+    "answers": [
+      "When prompted, tap 'Allow' to enable location. You can also enable location in your device settings for this app. Accurate location helps us send help to you faster.",
+      "Go to your device settings and allow location access for Alert Liberia.",
+      "Make sure your phone's location services are turned on for the app."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i use the ai chat",
+      "how does the chat work",
+      "can i ask questions here",
+      "what can i ask the chatbot"
+    ],
+    "answers": [
+      "Type your question or describe your emergency in the chat box. The AI can provide safety tips, first aid instructions, and answer questions about using the app.",
+      "You can ask me about emergencies, first aid, or how to use the app.",
+      "Just type your question and I'll do my best to help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "what number do i call for emergencies",
+      "emergency phone number",
+      "who do i call in an emergency",
+      "what is the emergency number"
+    ],
+    "answers": [
+      "For emergencies in Liberia, call 4455. You can also use this app to report emergencies and get help.",
+      "Dial 4455 for emergency assistance in Liberia.",
+      "The emergency number is 4455."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i see my reports",
+      "where are my reports",
+      "how can i check my submitted reports",
+      "view my emergency reports"
+    ],
+    "answers": [
+      "Tap the 'My Reports' section in the app menu to view all your submitted emergency reports and their status.",
+      "Go to 'My Reports' in the menu to see your past reports.",
+      "You can view your submitted reports and their status in the 'My Reports' section."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i contact the police",
+      "contact police",
+      "police emergency"
+    ],
+    "answers": [
+      "You can contact the police by selecting 'Police' on the home screen and submitting a report, or by calling 4455 for immediate assistance.",
+      "Tap 'Police' in the app or call 4455 for police emergencies."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i contact the fire department",
+      "fire emergency",
+      "contact fire department"
+    ],
+    "answers": [
+      "Select 'Fire' on the home screen to report a fire emergency, or call 4455. Provide your location and details for a faster response.",
+      "For fire emergencies, use the app or call 4455."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i contact medical help",
+      "ambulance",
+      "medical emergency",
+      "call ambulance"
+    ],
+    "answers": [
+      "For medical emergencies, select 'Medical' on the home screen or call 4455. If possible, provide details about the injury or illness.",
+      "Tap 'Medical' in the app or call 4455 for an ambulance."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i get disaster updates",
+      "disaster news",
+      "latest disaster information"
+    ],
+    "answers": [
+      "Check the 'News' section in the app for the latest disaster updates, safety tips, and official alerts.",
+      "Go to the News section for disaster updates and safety information."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i change my language",
+      "change app language",
+      "can i use another language"
+    ],
+    "answers": [
+      "Currently, the app is in English. Future updates may include support for more languages. Let us know if you need help in your local language.",
+      "Language support is coming soon. For now, the app is only in English."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "is my information private",
+      "is my information secure",
+      "is my data safe",
+      "privacy policy"
+    ],
+    "answers": [
+      "Yes, your information is kept private and secure. We only use your data to provide emergency assistance and do not share it without your consent.",
+      "Your data is protected and only used to help you in emergencies."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "can i use this app offline",
+      "does the app work offline",
+      "offline mode"
+    ],
+    "answers": [
+      "Some features may work offline, but reporting emergencies and getting real-time help requires an internet connection.",
+      "You need an internet connection to report emergencies and get updates."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "what should i do during a fire",
+      "fire safety tips",
+      "fire emergency advice"
+    ],
+    "answers": [
+      "If there's a fire, leave the building immediately if safe. Stay low to avoid smoke, use stairs (not elevators), and call 4455 or report via the app. Do not re-enter the building until it's declared safe.",
+      "Leave the area, avoid smoke, and call 4455 for help."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "what should i do during a flood",
+      "flood safety tips",
+      "flood emergency advice"
+    ],
+    "answers": [
+      "Move to higher ground immediately. Avoid walking or driving through flood waters. Stay informed via the app's news section and follow official instructions.",
+      "Stay away from flood waters and move to a safe place."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i update the app",
+      "update app",
+      "get latest version"
+    ],
+    "answers": [
+      "If you installed from the app store, check for updates there. If using the web version, refresh your browser to get the latest features.",
+      "Visit your app store to update, or refresh your browser for the latest version."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i reset my password",
+      "forgot password",
+      "change password"
+    ],
+    "answers": [
+      "Currently, the app does not require a password. Your device is your key. If you have issues, contact support.",
+      "No password is needed for this app. Contact support if you have trouble accessing your account."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "what should i do if i feel unsafe",
+      "i feel unsafe",
+      "i am in danger"
+    ],
+    "answers": [
+      "If you feel unsafe, move to a safe location if possible and contact emergency services immediately. You can also use this app to report your situation.",
+      "Find a safe place and call 4455 or use the app to report your situation."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "can i report anonymously",
+      "anonymous report",
+      "report without name"
+    ],
+    "answers": [
+      "Yes, you can submit reports without entering your name. However, providing contact information can help responders reach you faster.",
+      "You may report emergencies anonymously, but contact info helps us respond better."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i share my location",
+      "share location",
+      "send my location"
+    ],
+    "answers": [
+      "When prompted, tap 'Allow' to share your location. This helps emergency teams find you quickly.",
+      "Enable location services on your device and allow the app to access your location."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i cancel a report",
+      "cancel emergency report",
+      "delete a report"
+    ],
+    "answers": [
+      "If you need to cancel a report, please contact emergency services directly or use the chat to explain your situation.",
+      "To cancel a report, contact support or explain your situation in the chat."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "what should i do if the app is not working",
+      "app not working",
+      "app crashed",
+      "trouble with the app"
+    ],
+    "answers": [
+      "Try closing and reopening the app, or refreshing your browser. If the problem continues, contact support for help.",
+      "Restart the app or your device. If issues persist, contact support."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i get first aid tips",
+      "first aid advice",
+      "first aid instructions"
+    ],
+    "answers": [
+      "Ask me about any first aid situation (e.g., 'How do I treat a burn?'), and I'll provide step-by-step instructions.",
+      "Type your first aid question and I'll give you instructions."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "can i use this app for someone else",
+      "report for another person",
+      "help someone else"
+    ],
+    "answers": [
+      "Yes, you can report emergencies for others. Please provide as much detail as possible to help responders.",
+      "You may use the app to report emergencies for someone else in need."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i know help is coming",
+      "how will i know if help is on the way",
+      "confirmation of help"
+    ],
+    "answers": [
+      "After submitting a report, you'll see it in 'My Reports'. Our team will contact you if more information is needed.",
+      "You will receive updates in the app and may be contacted if more details are needed."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i attach my location to a report",
+      "include location in report",
+      "send location with report"
+    ],
+    "answers": [
+      "When submitting a report, your location is automatically included if you have enabled location services.",
+      "Make sure location is enabled on your device; the app will attach it to your report."
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "how do i get safety tips",
+      "safety tips",
+      "ask for safety advice",
+      "how can i get safety information"
+    ],
+    "answers": [
+      "You can ask me for safety tips about any emergency, or check the 'News' section for official advice.",
+      "Type your safety question here or visit the News section for tips.",
+      "I'm here to provide safety advice—just ask your question!"
+    ],
+    "isRegex": true
+  },
+  {
+    "questions": [
+      "what (time|hours) (is|are) (the )?helpline open",
+      "when is the helpline open",
+      "helpline hours",
+      "what are the helpline hours",
+      "is the helpline open now",
+      "when can I call the helpline",
+      "helpline availability"
+    ],
+    "answers": [
+      "The emergency helpline (4455) is available 24/7, every day.",
+      "You can call the emergency helpline (4455) at any time, day or night.",
+      "The helpline is open all day, every day."
+    ],
+    "isRegex": true
+  }
+]

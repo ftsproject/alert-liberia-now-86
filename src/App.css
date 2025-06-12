@@ -44,3 +44,12 @@
 .nav-ios { min-height: 68px; }
 .nav-android { min-height: 60px; }
 .nav-desktop { min-height: 56px; }
+
+/* Add to your global CSS if not using Tailwind's animate-bounce */
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0);}
+  40% { transform: translateY(-8px);}
+}
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
